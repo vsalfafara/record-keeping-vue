@@ -20,7 +20,7 @@ export const useAuthenticationStore = defineStore("authentication", () => {
     "user",
     null,
     localStorage,
-    serialization
+    serialization,
   );
 
   const getUser = computed(() => user);
@@ -35,5 +35,5 @@ export const useAuthenticationStore = defineStore("authentication", () => {
     user.value = null;
   }
 
-  return { getUser, isAuthenticated, login, logout };
+  return { user, getUser, isAuthenticated, login, logout };
 });

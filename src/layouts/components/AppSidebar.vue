@@ -50,7 +50,7 @@
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
               <SidebarMenuButton>
-                <User /> {{ user?.emailAddress }}
+                <User /> {{ user?.data.email }}
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -86,15 +86,8 @@ import {
 } from "@/components/ui/sidebar";
 import SidebarGroupContent from "@/components/ui/sidebar/SidebarGroupContent.vue";
 import { ChevronDown, User } from "lucide-vue-next";
-import { computed, onBeforeMount, ref } from "vue";
-import { sidebarRoutes } from "@/router/router.index";
-import { SIDEBARGROUPS } from "@/lib/types";
-import {
-  useRoute,
-  useRouter,
-  type RouteRecordName,
-  type RouteRecordRaw,
-} from "vue-router";
+import { computed } from "vue";
+import { useRoute, useRouter, type RouteRecordName } from "vue-router";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -103,30 +96,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthenticationStore } from "@/authentication/authentication.store";
 import { Separator } from "@/components/ui/separator";
-
-type GroupedRoute = {
-  name: string;
-  routes: RouteRecordRaw[];
-};
+import { useGroupedSidebarRoutes } from "./app-sidebar";
 
 const { openMobile, setOpenMobile } = useSidebar();
 const { getUser, logout } = useAuthenticationStore();
 const user = computed(() => getUser.value);
 const activeRoute = useRoute();
 const router = useRouter();
-const groupedRoutes = ref<GroupedRoute[]>([]);
-
-onBeforeMount(() => {
-  Object.values(SIDEBARGROUPS).forEach((group) => {
-    const routes = {
-      name: group,
-      routes: sidebarRoutes.filter(({ meta }) =>
-        meta ? meta.group === group : false
-      ),
-    };
-    if (routes.routes.length) groupedRoutes.value.push(routes);
-  });
-});
+const { groupedRoutes } = useGroupedSidebarRoutes();
 
 function handleNavigate(name: RouteRecordName) {
   if (openMobile) setOpenMobile(false);

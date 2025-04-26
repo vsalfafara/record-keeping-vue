@@ -1,3 +1,3 @@
-import { usersModuleRoutes } from "./users/users.routes";
+import { accessManagementModuleRoutes } from "./access-management/access-management";
 
-export const adminModuleRoutes = [...usersModuleRoutes];
+export const adminModuleRoutes = [...accessManagementModuleRoutes];

@@ -1,4 +1,4 @@
-import { SIDEBARGROUPS } from "@/lib/types";
+import { ROLES, SIDEBARGROUPS } from "@/lib/constants";
 import { FileCheck } from "lucide-vue-next";
 
 export const tasksModuleRoutes = [
@@ -7,6 +7,7 @@ export const tasksModuleRoutes = [
     name: "Tasks",
     component: () => import("./Tasks.vue"),
     meta: {
+      access: [ROLES.accountsClerk, ROLES.admin],
       group: SIDEBARGROUPS.dashboard,
       icon: FileCheck,
     },

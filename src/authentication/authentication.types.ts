@@ -1,13 +1,15 @@
-export type User = {
-  id: string;
+export interface Credentials {
+  data: UserData;
+  token: string;
+}
+
+export interface UserData {
+  id: number;
   firstName: string;
   lastName: string;
-  username: string;
-  emailAddress: string;
+  email: string;
   role: string;
-};
-
-export type Credentials = {
-  emailAddress: string;
-  password: string;
-};
+  hasLoggedInOnce: boolean;
+  createdBy: string;
+  createdOn: string;
+}
