@@ -113,7 +113,12 @@
           <DialogClose as-child>
             <Button type="button" variant="outline"> Cancel </Button>
           </DialogClose>
-          <Button type="submit" form="add-user-form" :disabled="isLoading">
+          <Button
+            variant="info"
+            type="submit"
+            form="add-user-form"
+            :disabled="isLoading"
+          >
             <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
             {{ isLoading ? "Creating user..." : "Confirm" }}
           </Button>
