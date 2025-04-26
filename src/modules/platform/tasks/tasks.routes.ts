@@ -8,7 +8,7 @@ export const tasksModuleRoutes = [
     component: () => import("./Tasks.vue"),
     meta: {
       access: [ROLES.accountsClerk, ROLES.admin],
-      group: SIDEBARGROUPS.dashboard,
+      group: SIDEBARGROUPS.platform,
       icon: FileCheck,
     },
   },

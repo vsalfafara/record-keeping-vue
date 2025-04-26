@@ -1,5 +1,5 @@
 export const SIDEBARGROUPS = {
-  dashboard: "Dashboard",
+  platform: "Platform",
   admin: "Admin",
 };
 
