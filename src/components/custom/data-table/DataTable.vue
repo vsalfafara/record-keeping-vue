@@ -162,7 +162,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { ChevronDown, Funnel, Loader2, Settings2 } from "lucide-vue-next";
+import { Funnel, Loader2, Settings2 } from "lucide-vue-next";
 import { ref, watch } from "vue";
 import {
   Select,
