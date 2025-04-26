@@ -3,7 +3,7 @@ import { Users2 } from "lucide-vue-next";
 
 export const accessManagementModuleRoutes = [
   {
-    path: "/users",
+    path: "/access-management",
     name: "Access Management",
     component: () => import("./AccessManagement.vue"),
     meta: {

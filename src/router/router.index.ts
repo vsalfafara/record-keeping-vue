@@ -38,7 +38,8 @@ router.beforeEach((to, from, next) => {
 
   if (!isAuthenticated && to.name !== "Login") next({ name: "Login" });
   else if (isAuthenticated) {
-    if (to.name === "Login") next({ name: "Tasks" });
+    if (to.path === "/") next({ name: "Tasks" });
+    else if (to.name === "Login") next({ name: "Tasks" });
     else if (
       to.meta.access instanceof Array &&
       !to.meta.access.includes(user.value?.data.role)
