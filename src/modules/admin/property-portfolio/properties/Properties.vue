@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-4 grid gap-y-4">
-      <div class="flex gap-2">
+      <div class="flex items-center gap-2">
         <h1 class="text-3xl font-semibold">Property Portfolio</h1>
         <Badge variant="outline"
           >Total available lots:
