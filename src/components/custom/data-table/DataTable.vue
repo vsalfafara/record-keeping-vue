@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <div class="flex items-center justify-between gap-2 py-4">
+    <div class="flex items-center justify-between gap-2 py-2">
       <div v-if="enableFilter" class="flex flex-1 items-center gap-2">
         <Input
           class="max-w-xs"
