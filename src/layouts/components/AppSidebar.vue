@@ -1,7 +1,12 @@
 <template>
   <Sidebar>
     <SidebarHeader
-      ><h3 class="text-lg font-semibold text-center">Vue - ShadCN Template</h3>
+      ><h3 class="flex items-center gap-2 p-2 text-lg font-semibold">
+        <TreePine
+          class="lucide lucide-tree-pine-icon h-10 w-10 rounded-md bg-green-600 p-2 text-white"
+        />
+        Pines Memorial
+      </h3>
     </SidebarHeader>
     <SidebarContent>
       <template v-for="(group, index) in groupedRoutes" :key="group.name">
@@ -85,7 +90,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import SidebarGroupContent from "@/components/ui/sidebar/SidebarGroupContent.vue";
-import { ChevronDown, User } from "lucide-vue-next";
+import { ChevronDown, TreePine, User } from "lucide-vue-next";
 import { computed } from "vue";
 import { useRoute, useRouter, type RouteRecordName } from "vue-router";
 import {

@@ -2,6 +2,7 @@ import { authenticationRoutes } from "@/authentication/authentication.routes";
 import { useAuthenticationStore } from "@/authentication/authentication.store";
 import { adminModuleRoutes } from "@/modules/admin/admin.routes";
 import { platformModuleRoutes } from "@/modules/platform/platform.routes";
+import { useTitle } from "@vueuse/core";
 import { computed } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { toast } from "vue-sonner";
@@ -35,6 +36,9 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const { isAuthenticated, getUser } = useAuthenticationStore();
   const user = computed(() => getUser.value);
+  const title = useTitle();
+
+  title.value = String(to.name);
 
   if (!isAuthenticated && to.name !== "Login") next({ name: "Login" });
   else if (isAuthenticated) {

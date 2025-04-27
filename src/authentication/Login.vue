@@ -1,6 +1,6 @@
 <template>
-  <div class="h-screen grid justify-center lg:grid-cols-2">
-    <div class="relative hidden bg-muted lg:block">
+  <div class="grid h-screen justify-center lg:grid-cols-2">
+    <div class="bg-muted relative hidden lg:block">
       <img
         src="./assets/placeholder.svg"
         alt="Image"
@@ -8,12 +8,12 @@
       />
     </div>
     <div
-      class="p-4 w-screen lg:w-full flex flex-col gap-6 justify-center items-center relative"
+      class="relative flex w-screen flex-col items-center justify-center gap-6 p-4 lg:w-full"
     >
       <DarkMode class="absolute top-4 right-4" />
       <div class="grid items-center gap-2 text-center">
         <h1 class="text-2xl font-bold">Login to your account</h1>
-        <p class="text-balance text-sm text-muted-foreground">
+        <p class="text-muted-foreground text-sm text-balance">
           Enter your email below to login to your account
         </p>
       </div>
@@ -69,8 +69,7 @@ import { DarkMode } from "@/components/custom/dark-mode";
 import { useRouter } from "vue-router";
 import { useAxios } from "@vueuse/integrations/useAxios";
 import { useAxiosInstance } from "@/lib/axios";
-import { AxiosError, HttpStatusCode } from "axios";
-import { toast } from "vue-sonner";
+import { AxiosError } from "axios";
 import { Loader2 } from "lucide-vue-next";
 
 const { login } = useAuthenticationStore();
@@ -81,7 +80,7 @@ const formSchema = toTypedSchema(
   z.object({
     email: z.string().min(1, { message: "Email is required" }).email(),
     password: z.string(),
-  })
+  }),
 );
 
 async function handleLogin(values: any) {
@@ -91,9 +90,7 @@ async function handleLogin(values: any) {
     router.replace("/");
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
-      if (error.status === HttpStatusCode.UnprocessableEntity) {
-        toast.error(error.response?.data.message);
-      }
+      throw new Error(error.response?.data.message);
     }
   }
 }

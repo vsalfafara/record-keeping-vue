@@ -24,17 +24,12 @@ import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { ArrowUpDown } from "lucide-vue-next";
 import { h } from "vue";
 import AddUserDialog from "./components/AddUserDialog.vue";
+import type { User } from "./access-management.types";
+import EditUserDialog from "./components/EditUserDialog.vue";
+import { useAuthenticationStore } from "@/authentication/authentication.store";
+import DeleteUserDialog from "./components/DeleteUserDialog.vue";
 
-type User = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: ["ADMIN", "ACCOUNTS_CLERK"];
-  hasLoggedInOnce: boolean;
-  createdBy: string;
-  createdOn: string;
-};
+const { getUser } = useAuthenticationStore();
 
 const visibleColumns = useStorage<VisibilityState>(
   "users-table",
@@ -143,6 +138,24 @@ const columns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => row.getValue("createdOn"),
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const user = row.original;
+      const actions = [];
+
+      actions.push(h(EditUserDialog, { user, onRefresh: () => execute() }));
+
+      if (getUser.value?.data.id !== user.id) {
+        actions.push(
+          h(DeleteUserDialog, { id: user.id, onRefresh: () => execute() }),
+        );
+      }
+
+      return h("div", { class: "flex gap-2 justify-end" }, actions);
+    },
   },
 ];
 </script>

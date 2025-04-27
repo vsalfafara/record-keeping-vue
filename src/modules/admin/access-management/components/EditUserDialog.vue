@@ -1,18 +1,24 @@
 <template>
-  <Form v-slot="{ handleSubmit }" :validation-schema="formSchema" as="">
+  <Form
+    keep-values
+    v-slot="{ handleSubmit }"
+    :initial-values="user"
+    :validation-schema="formSchema"
+    as=""
+  >
     <Dialog :open="dialogState" @update:open="(state) => (dialogState = state)">
       <DialogTrigger as-child>
-        <Button variant="info"> <Plus /> Add User </Button>
+        <Button variant="outline" size="icon"> <Pen /> </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle
-            ><Plus
+            ><Pen
               class="bg-info/10 text-info dark:bg-info h-8 w-8 rounded-md p-2 dark:text-white"
           /></DialogTitle>
           <DialogDescription>
-            <h3 class="text-primary mb-2 text-lg font-semibold">Add User</h3>
-            <p>Fill out the form</p>
+            <h3 class="mb-2 text-lg font-semibold text-slate-900">Edit User</h3>
+            <p>Modify the details</p>
           </DialogDescription>
         </DialogHeader>
         <form
@@ -121,7 +127,7 @@
             :disabled="isLoading"
           >
             <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
-            {{ isLoading ? "Creating user..." : "Confirm" }}
+            {{ isLoading ? "Saving changes..." : "Save Changes" }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -130,7 +136,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthenticationStore } from "@/authentication/authentication.store";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -161,13 +166,19 @@ import {
 } from "@/components/ui/select";
 import { useGuardedAxiosInstance } from "@/lib/axios";
 import { toTypedSchema } from "@vee-validate/zod";
-import { now, useDateFormat } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { AxiosError } from "axios";
-import { Plus, Loader2, EyeClosed, Eye } from "lucide-vue-next";
+import { Loader2, EyeClosed, Eye, Pen } from "lucide-vue-next";
 import { ref } from "vue";
 import { toast } from "vue-sonner";
 import { z } from "zod";
+import type { User } from "../access-management.types";
+
+type EditUserDialogProps = {
+  user: User;
+};
+
+const { user } = defineProps<EditUserDialogProps>();
 
 const emit = defineEmits(["refresh"]);
 
@@ -181,27 +192,29 @@ const formSchema = toTypedSchema(
   z.object({
     firstName: z.string().min(1),
     lastName: z.string().min(1),
-    email: z.string().email(),
+    email: z.string().min(1).email(),
     password: z
       .string()
-      .min(8, { message: "Password must be minimum 8 characters" })
-      .regex(/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/, {
-        message:
-          "Password must have at least 1 letter, at least 1 number, and at least 1 special character",
-      }),
+      .optional()
+      .or(
+        z
+          .string()
+          .min(8, { message: "Password must be minimum 8 characters" })
+          .regex(/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/, {
+            message:
+              "Password must have at least 1 letter, at least 1 number, and at least 1 special character",
+          }),
+      ),
     role: z.enum(["ADMIN", "ACCOUNTS_CLERK"]),
   }),
 );
 
 async function handleCreateUser(values: any) {
   try {
-    const { user } = useAuthenticationStore();
     const body = {
       ...values,
-      createdBy: user?.data.firstName,
-      createdOn: useDateFormat(now(), "YYYY-MM-DD").value,
     };
-    await execute("/users", { method: "POST", data: body });
+    await execute(`/users/${user.id}`, { method: "PUT", data: body });
     toast.success(data.value.message);
     dialogState.value = false;
     emit("refresh");
