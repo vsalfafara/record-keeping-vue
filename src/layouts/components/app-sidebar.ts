@@ -12,9 +12,14 @@ export function useGroupedSidebarRoutes() {
     const routes = {
       name: group,
       routes: sidebarRoutes.filter(({ meta }) => {
-        const groupIsEqual = meta.group === group;
-        const userHasAccess = meta.access.includes(user.value?.data.role || "");
-        return groupIsEqual && userHasAccess;
+        if (meta) {
+          const groupIsEqual = meta.group === group;
+          const userHasAccess = meta.access.includes(
+            user.value?.data.role || "",
+          );
+          return groupIsEqual && userHasAccess;
+        }
+        return false;
       }),
     };
     if (routes.routes.length) groupedRoutes.value.push(routes);

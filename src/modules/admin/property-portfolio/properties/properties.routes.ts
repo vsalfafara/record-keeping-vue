@@ -12,4 +12,9 @@ export const propertiesModuleRoutes = [
       icon: MapPin,
     },
   },
+  {
+    path: "/properties/:id",
+    name: "Property",
+    component: () => import("./pages/Property.vue"),
+  },
 ];

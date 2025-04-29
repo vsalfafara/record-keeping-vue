@@ -5,7 +5,7 @@
         <TreePine
           class="lucide lucide-tree-pine-icon h-10 w-10 rounded-md bg-green-600 p-2 text-white"
         />
-        Pines Memorial
+        <span class="text-green-600">Pines Memorial</span>
       </h3>
     </SidebarHeader>
     <SidebarContent>

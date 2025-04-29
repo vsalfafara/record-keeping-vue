@@ -4,7 +4,7 @@
       <div v-if="enableFilter" class="flex flex-1 items-center gap-2">
         <Input
           class="max-w-xs"
-          placeholder="Search"
+          :placeholder="`Search ${columnToFilter && columnToFilter !== 'all' ? table.getColumn(columnToFilter)?.columnDef.meta : 'All'}`"
           v-model="search"
           :disabled="!columnToFilter"
         />
@@ -183,7 +183,7 @@ const {
   visibleColumns = {},
 } = defineProps<DataTableProps>();
 
-const search = ref<string>();
+const search = ref<any>();
 const columnToFilter = ref<string>();
 
 const sorting = ref<SortingState>([]);
@@ -236,9 +236,10 @@ function initializeTable() {
 }
 
 function handleFilter() {
-  if (columnToFilter.value === "all") table.setGlobalFilter(search.value);
-  else
-    table.getColumn(columnToFilter.value || "")?.setFilterValue(search.value);
+  if (columnToFilter.value) {
+    if (columnToFilter.value === "all") table.setGlobalFilter(search.value);
+    else table.getColumn(columnToFilter.value)?.setFilterValue(search.value);
+  }
 }
 
 watch(
