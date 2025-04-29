@@ -97,6 +97,8 @@ const columns: ColumnDef<PropertyColumns>[] = [
   {
     accessorKey: "numberOfBlocks",
     enableSorting: true,
+    enableColumnFilter: false,
+    enableGlobalFilter: false,
     meta: "# of Blocks",
     header: ({ column }) => {
       return h(
@@ -113,6 +115,8 @@ const columns: ColumnDef<PropertyColumns>[] = [
   {
     accessorKey: "numberOfLots",
     enableSorting: true,
+    enableColumnFilter: false,
+    enableGlobalFilter: false,
     meta: "# of Lots",
     header: ({ column }) => {
       return h(
@@ -129,6 +133,8 @@ const columns: ColumnDef<PropertyColumns>[] = [
   {
     accessorKey: "takenLots",
     enableSorting: true,
+    enableColumnFilter: false,
+    enableGlobalFilter: false,
     meta: "Taken Lots",
     header: ({ column }) => {
       return h(
@@ -145,6 +151,8 @@ const columns: ColumnDef<PropertyColumns>[] = [
   {
     accessorKey: "availableLots",
     enableSorting: true,
+    enableColumnFilter: false,
+    enableGlobalFilter: false,
     meta: "Available Lots",
     header: ({ column }) => {
       return h(
