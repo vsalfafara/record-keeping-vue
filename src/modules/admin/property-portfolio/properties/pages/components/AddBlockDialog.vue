@@ -25,7 +25,7 @@
               <FormControl>
                 <Input
                   type="text"
-                  placeholder="Input property name"
+                  placeholder="Input block name"
                   v-bind="componentField"
                 />
               </FormControl>

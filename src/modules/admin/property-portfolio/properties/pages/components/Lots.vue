@@ -1,7 +1,7 @@
 <template>
   <DataTable enable-filter :data :isLoading :columns :visibleColumns>
     <template #actions>
-      <AddBlockDialog @refresh="execute()" />
+      <AddLotDialog :blockId @refresh="execute()" />
     </template>
   </DataTable>
 </template>
@@ -9,38 +9,44 @@
 <script setup lang="ts">
 import { DataTable } from "@/components/custom/data-table";
 import { Button } from "@/components/ui/button";
+import EditLotDialog from "./EditLotDialog.vue";
 import { useGuardedAxiosInstance } from "@/lib/axios";
 import type { ColumnDef, VisibilityState } from "@tanstack/vue-table";
 import { useStorage } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { ArrowUpDown } from "lucide-vue-next";
 import { h } from "vue";
-import { useRoute } from "vue-router";
-import AddBlockDialog from "./AddBlockDialog.vue";
-import EditBlockSheet from "./EditBlockSheet.vue";
+import AddLotDialog from "./AddLotDialog.vue";
+import { Badge } from "@/components/ui/badge";
+import { RemarksTooltip } from "@/components/custom/remarks-tooltip";
 
-type BlockColumns = {
+type LotColumns = {
   id: number;
   name: string;
-  numberOfLots: number;
-  takenLots: number;
-  availableLots: number;
+  lotType: string;
+  price: number;
+  taken: boolean;
+  remarks: string;
   createdBy: number;
   createdOn: number;
 };
 
-const { params } = useRoute();
+type LotsProps = {
+  blockId: number;
+};
+
+const { blockId } = defineProps<LotsProps>();
 const visibleColumns = useStorage<VisibilityState>(
-  "blocks-table",
+  "lots-table",
   {},
   localStorage,
 );
 const { data, execute, isLoading } = useAxios(
-  `/properties/${params.id}/blocks`,
+  `/blocks/${blockId}/lots`,
   useGuardedAxiosInstance(),
 );
 
-const columns: ColumnDef<BlockColumns>[] = [
+const columns: ColumnDef<LotColumns>[] = [
   {
     accessorKey: "name",
     enableSorting: true,
@@ -58,9 +64,9 @@ const columns: ColumnDef<BlockColumns>[] = [
     cell: ({ row }) => row.getValue("name"),
   },
   {
-    accessorKey: "numberOfLots",
+    accessorKey: "lotType",
     enableSorting: true,
-    meta: "# of Lots",
+    meta: "Lot Type",
     header: ({ column }) => {
       return h(
         Button,
@@ -68,15 +74,17 @@ const columns: ColumnDef<BlockColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["# of Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["Lot Type", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("numberOfLots"),
+    cell: ({ row }) => row.getValue("lotType"),
   },
   {
-    accessorKey: "takenLots",
+    accessorKey: "price",
     enableSorting: true,
-    meta: "Taken Lots",
+    enableColumnFilter: false,
+    enableGlobalFilter: false,
+    meta: "Price",
     header: ({ column }) => {
       return h(
         Button,
@@ -84,15 +92,29 @@ const columns: ColumnDef<BlockColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Taken Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["Price", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("takenLots"),
+    cell: ({ row }) => row.getValue("price"),
   },
   {
-    accessorKey: "availableLots",
+    accessorKey: "taken",
+    enableSorting: false,
+    enableColumnFilter: false,
+    enableGlobalFilter: false,
+    meta: "Is Taken",
+    header: "Is Taken",
+    cell: ({ row }) => {
+      const isTaken = row.getValue("taken");
+      const value = isTaken ? "Taken" : "Not Taken";
+      const variant = isTaken ? "success" : "destructive";
+      return h(Badge, { variant }, () => value);
+    },
+  },
+  {
+    accessorKey: "remarks",
     enableSorting: true,
-    meta: "Available Lots",
+    meta: "Remarks",
     header: ({ column }) => {
       return h(
         Button,
@@ -100,10 +122,14 @@ const columns: ColumnDef<BlockColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Available Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["Remarks", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("availableLots"),
+    cell: ({ row }) => {
+      const remarks: string = row.getValue("remarks");
+      if (remarks) return h(RemarksTooltip, { remarks });
+      return remarks;
+    },
   },
   {
     accessorKey: "createdBy",
@@ -141,10 +167,10 @@ const columns: ColumnDef<BlockColumns>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const { id: blockId } = row.original;
+      const lot: any = row.original;
       const actions = [];
 
-      actions.push(h(EditBlockSheet, { blockId, onRefresh: () => execute() }));
+      actions.push(h(EditLotDialog, { lot, onRefresh: () => execute() }));
 
       return h("div", { class: "flex gap-2 justify-end" }, actions);
     },

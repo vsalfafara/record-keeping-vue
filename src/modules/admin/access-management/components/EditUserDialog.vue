@@ -17,7 +17,7 @@
               class="bg-info/10 text-info dark:bg-info h-8 w-8 rounded-md p-2 dark:text-white"
           /></DialogTitle>
           <DialogDescription>
-            <h3 class="mb-2 text-lg font-semibold text-slate-900">Edit User</h3>
+            <h3 class="text-info mb-2 text-lg font-semibold">Edit User</h3>
             <p>Modify the details</p>
           </DialogDescription>
         </DialogHeader>
