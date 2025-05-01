@@ -47,7 +47,7 @@
                 </FormControl>
               </FormItem>
             </FormField>
-            <FormField v-slot="{ componentField }" name="birthDate">
+            <FormField name="birthDate">
               <FormItem>
                 <FormLabel>Birth Date</FormLabel>
                 <FormControl>
