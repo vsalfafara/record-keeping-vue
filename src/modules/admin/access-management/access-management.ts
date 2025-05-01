@@ -1,5 +1,5 @@
 import { ROLES, SIDEBARGROUPS } from "@/lib/constants";
-import { Users2 } from "lucide-vue-next";
+import { UserCog } from "lucide-vue-next";
 
 export const accessManagementModuleRoutes = [
   {
@@ -9,7 +9,7 @@ export const accessManagementModuleRoutes = [
     meta: {
       access: [ROLES.admin],
       group: SIDEBARGROUPS.admin,
-      icon: Users2,
+      icon: UserCog,
     },
   },
 ];

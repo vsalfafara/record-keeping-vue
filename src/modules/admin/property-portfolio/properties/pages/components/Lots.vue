@@ -1,5 +1,5 @@
 <template>
-  <DataTable enable-filter :data :isLoading :columns :visibleColumns>
+  <DataTable enable-filter :data :isLoading :columns :visibleColumns max-height>
     <template #actions>
       <AddLotDialog :blockId @refresh="execute()" />
     </template>

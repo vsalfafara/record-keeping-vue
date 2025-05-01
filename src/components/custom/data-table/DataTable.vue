@@ -56,7 +56,10 @@
       </DropdownMenu>
       <slot name="actions" />
     </div>
-    <div class="rounded-md border">
+    <div
+      class="rounded-md border"
+      :class="{ 'max-h-[calc(100dvh-400px)] overflow-y-auto': maxHeight }"
+    >
       <Table>
         <TableHeader>
           <TableRow
@@ -173,6 +176,7 @@ type DataTableProps = {
   data: any[];
   isLoading: boolean;
   visibleColumns?: VisibilityState;
+  maxHeight?: boolean;
 };
 
 const {
@@ -181,6 +185,7 @@ const {
   isLoading = false,
   enableFilter = false,
   visibleColumns = {},
+  maxHeight = false,
 } = defineProps<DataTableProps>();
 
 const search = ref<any>();

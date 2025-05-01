@@ -1,3 +1,3 @@
-import { tasksModuleRoutes } from "./tasks/tasks.routes";
+import { clientsModuleRoutes } from "./clients/clients.routes";
 
-export const platformModuleRoutes = [...tasksModuleRoutes];
+export const platformModuleRoutes = [...clientsModuleRoutes];

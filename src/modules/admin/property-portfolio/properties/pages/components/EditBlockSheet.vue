@@ -30,7 +30,7 @@
           <p>Fill out the form</p>
         </SheetDescription>
       </SheetHeader>
-      <div class="grid gap-4 p-4">
+      <div class="flex flex-col gap-4 p-4">
         <form @submit="handleUpdateBlock" class="flex items-end gap-2">
           <FormField v-slot="{ componentField }" name="name">
             <FormItem class="flex-1">
@@ -46,7 +46,7 @@
             {{ isLoading ? "Saving changes..." : "Save Changes" }}
           </Button>
         </form>
-        <div>
+        <div class="max-w-full overflow-y-auto">
           <p class="text-info">Lots</p>
           <Lots :blockId />
         </div>

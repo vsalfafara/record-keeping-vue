@@ -18,3 +18,8 @@ export function valueUpdater<T extends Updater<any>>(
       ? updaterOrValue(ref.value)
       : updaterOrValue;
 }
+
+export const currencyFormatter = new Intl.NumberFormat("ph-PH", {
+  style: "currency",
+  currency: "PHP",
+});
