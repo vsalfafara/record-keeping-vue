@@ -507,7 +507,6 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthenticationStore } from "@/authentication/authentication.store";
 import { AdvancedCalendar } from "@/components/custom/advanced-calendar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -544,15 +543,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGuardedAxiosInstance } from "@/lib/axios";
 import { toTypedSchema } from "@vee-validate/zod";
-import { now, useDateFormat, useFileDialog } from "@vueuse/core";
+import { useFileDialog } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
-import { AxiosError } from "axios";
-import { Plus, Loader2, CalendarIcon, CloudUpload } from "lucide-vue-next";
+// import { AxiosError } from "axios";
+import { Plus, CalendarIcon, CloudUpload } from "lucide-vue-next";
 import { ref } from "vue";
 import { toast } from "vue-sonner";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
-import { useEnv } from "@/lib/env";
+// import { useEnv } from "@/lib/env";
 
 const emit = defineEmits(["refresh"]);
 
@@ -614,9 +613,9 @@ const paymentPlans = ref<string[]>([
 const terms = ref<number[]>([12, 24, 36, 48, 60]);
 
 const downpaymentWithInterest = ref<number[]>([0, 0.1, 0.2, 0.3, 0.4, 0.5]);
-const downpaymentWithoutInterest = ref<number[]>([
-  0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
-]);
+// const downpaymentWithoutInterest = ref<number[]>([
+//   0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
+// ]);
 
 const modeOfPayment = ref<string[]>([
   "Bank Transfer",
@@ -790,41 +789,41 @@ function computeForActualPrice(values: any, setFieldValue: any) {
   setFieldValue("actualPrice", actualPrice);
 }
 
-function getLotInfo(values: any) {
-  const {
-    firstName,
-    lastName,
-    fullAddress,
-    birthDate,
-    email,
-    mobileNumber,
-    landlineNumber,
-    dateOfPayment,
-    receipt,
-    ...lot
-  } = values;
-  return lot;
-}
+// function getLotInfo(values: any) {
+//   const {
+//     firstName,
+//     lastName,
+//     fullAddress,
+//     birthDate,
+//     email,
+//     mobileNumber,
+//     landlineNumber,
+//     dateOfPayment,
+//     receipt,
+//     ...lot
+//   } = values;
+//   return lot;
+// }
 
-async function handleUploadReceipt(receipt: File) {
-  // try {
-  //   const { env } = useEnv()
-  //   const formData = new FormData();
-  //   formData.append("api_key", env.VITE_CLOUDINARY_API_KEY);
-  //   formData.append("file", receipt);
-  //   formData.append("upload_preset", env.VITE_CLOUDINARY_UPLOAD_PRESET);
-  //   const response: any = await $fetch(
-  //     `https://api.cloudinary.com/v1_1/${config.public.cloudinary.cloudName}/image/upload`,
-  //     {
-  //       method: "POST",
-  //       body: formData,
-  //     }
-  //   );
-  //   return response.public_id;
-  // } catch (error) {
-  //   console.log(error);
-  // }
-}
+// async function handleUploadReceipt(receipt: File) {
+//   try {
+//     const { env } = useEnv()
+//     const formData = new FormData();
+//     formData.append("api_key", env.VITE_CLOUDINARY_API_KEY);
+//     formData.append("file", receipt);
+//     formData.append("upload_preset", env.VITE_CLOUDINARY_UPLOAD_PRESET);
+//     const response: any = await $fetch(
+//       `https://api.cloudinary.com/v1_1/${config.public.cloudinary.cloudName}/image/upload`,
+//       {
+//         method: "POST",
+//         body: formData,
+//       }
+//     );
+//     return response.public_id;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
 async function handleCreateClientLot(values: any) {
   console.log(values);
