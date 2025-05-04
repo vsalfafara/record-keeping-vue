@@ -171,12 +171,12 @@ import {
 } from "@/components/ui/select";
 
 type DataTableProps = {
-  enableFilter?: boolean;
   columns: ColumnDef<TData, TValue>[];
   data: any[];
   isLoading: boolean;
   visibleColumns?: VisibilityState;
   maxHeight?: boolean;
+  enableFilter?: boolean;
 };
 
 const {
