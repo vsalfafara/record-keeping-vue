@@ -1,7 +1,7 @@
 <template>
   <DataTable enable-filter :data :isLoading :columns :visibleColumns>
     <template #actions>
-      <AddClientLotDialog @refresh="execute()" />
+      <AddClientLotDialog :client-id="Number(params.id)" @refresh="execute()" />
     </template>
   </DataTable>
 </template>

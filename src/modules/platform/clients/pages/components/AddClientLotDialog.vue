@@ -52,7 +52,7 @@
                     <SelectItem
                       v-for="property in properties"
                       :key="property.id"
-                      :value="property.id.toString()"
+                      :value="property.id"
                     >
                       {{ property.name }}
                     </SelectItem>
@@ -90,7 +90,7 @@
                     <SelectItem
                       v-for="block in blocks"
                       :key="block.id"
-                      :value="block.id.toString()"
+                      :value="block.id"
                     >
                       {{ block.name }}
                     </SelectItem>
@@ -114,7 +114,7 @@
                     <SelectItem
                       v-for="lot in lots"
                       :key="lot.id"
-                      :value="lot.id.toString()"
+                      :value="lot.id"
                     >
                       {{ lot.name }}
                     </SelectItem>
@@ -497,8 +497,31 @@
           <DialogClose as-child>
             <Button type="button" variant="outline"> Cancel </Button>
           </DialogClose>
-          <Button variant="info" type="submit" form="add-client-lot-form">
-            Confirm
+          <Button
+            variant="info"
+            type="submit"
+            form="add-client-lot-form"
+            :disabled="
+              isCreateClientRecordLotLoading ||
+              isUploadReceiptLoading ||
+              isCreateInvoiceLoading
+            "
+          >
+            <Loader2
+              v-if="
+                isCreateClientRecordLotLoading ||
+                isUploadReceiptLoading ||
+                isCreateInvoiceLoading
+              "
+              class="animate-spin"
+            />
+            {{
+              isCreateClientRecordLotLoading ||
+              isUploadReceiptLoading ||
+              isCreateInvoiceLoading
+                ? "Creating client lot record..."
+                : "Confirm"
+            }}
           </Button>
         </DialogFooter>
       </DialogScrollContent>
@@ -543,15 +566,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGuardedAxiosInstance } from "@/lib/axios";
 import { toTypedSchema } from "@vee-validate/zod";
-import { useFileDialog } from "@vueuse/core";
+import { now, useDateFormat, useFileDialog } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 // import { AxiosError } from "axios";
-import { Plus, CalendarIcon, CloudUpload } from "lucide-vue-next";
+import { Plus, CalendarIcon, CloudUpload, Loader2 } from "lucide-vue-next";
 import { ref } from "vue";
 import { toast } from "vue-sonner";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
-// import { useEnv } from "@/lib/env";
+import { useAuthenticationStore } from "@/authentication/authentication.store";
+import { useEnv } from "@/lib/env";
+import { AxiosError } from "axios";
+
+type AddClientLotDialogProps = {
+  clientId: number;
+};
+
+const { clientId } = defineProps<AddClientLotDialogProps>();
 
 const emit = defineEmits(["refresh"]);
 
@@ -580,6 +611,32 @@ const {
   immediate: false,
 });
 
+const {
+  data: newClientLotRecordData,
+  execute: createClientLotRecord,
+  isLoading: isCreateClientRecordLotLoading,
+} = useAxios("", useGuardedAxiosInstance(), {
+  immediate: false,
+});
+const {
+  data: newReceipt,
+  execute: uploadReceipt,
+  isLoading: isUploadReceiptLoading,
+} = useAxios(
+  "",
+  {},
+  {
+    immediate: false,
+  },
+);
+const {
+  data: newInvoice,
+  execute: createInvoice,
+  isLoading: isCreateInvoiceLoading,
+} = useAxios("", useGuardedAxiosInstance(), {
+  immediate: false,
+});
+
 const dialogState = ref<boolean>(false);
 
 const withInterestFactors = {
@@ -599,15 +656,15 @@ const withoutInterestTerms = {
 };
 
 const paymentTypes = ref<string[]>([
-  "Reservation",
+  // "Reservation",
   "Monthly Terms",
-  "Full Payment",
+  // "Full Payment",
 ]);
 
 const paymentPlans = ref<string[]>([
   "Downpayment and Installment (with interest)",
-  "Downpayment and Installment (without interest)",
-  "Installment only (with interest)",
+  // "Downpayment and Installment (without interest)",
+  // "Installment only (with interest)",
 ]);
 
 const terms = ref<number[]>([12, 24, 36, 48, 60]);
@@ -624,9 +681,9 @@ const modeOfPayment = ref<string[]>([
 ]);
 
 const baseSchema = z.object({
-  propertyId: z.string().min(1),
-  blockId: z.string().min(1),
-  lotId: z.string().min(1),
+  propertyId: z.number(),
+  blockId: z.number(),
+  lotId: z.number(),
   paymentType: z.enum(["Reservation", "Monthly Terms", "Full Payment"]),
   lotPrice: z.number().multipleOf(0.01),
   modeOfPayment: z.enum(["Bank Transfer", "Cash Payment", "Check Payment"]),
@@ -635,6 +692,11 @@ const baseSchema = z.object({
   discount: z.number().min(0).multipleOf(0.01).optional().or(z.literal(0)),
   actualPrice: z.number().multipleOf(0.01),
   remarks: z.string().optional(),
+  terms: z.any().pipe(z.coerce.number()).optional(),
+  downpayment: z.any().optional(),
+  downpaymentPrice: z.number().multipleOf(0.01).optional().default(0),
+  totalInterest: z.number().multipleOf(0.01).optional().default(0),
+  monthly: z.number().multipleOf(0.01).optional().default(0),
 });
 
 const reservationSchema = z.object({
@@ -665,8 +727,10 @@ const downpaymentAndInstallmentWithInterestSchema = z.object({
   downpayment: z
     .enum(["0", "0.1", "0.2", "0.3", "0.4", "0.5"])
     .pipe(z.coerce.number().min(0)),
-  downpaymentPrice: z.number().min(1).multipleOf(0.01).default(0),
+  downpaymentPrice: z.number().multipleOf(0.01).min(1),
   terms: z.enum(["12", "24", "36", "48", "60"]).pipe(z.coerce.number()),
+  totalInterest: z.number().multipleOf(0.01),
+  monthly: z.number().multipleOf(0.01),
 });
 
 const downpaymentAndInstallmentWithoutInterestSchema = z.object({
@@ -789,59 +853,67 @@ function computeForActualPrice(values: any, setFieldValue: any) {
   setFieldValue("actualPrice", actualPrice);
 }
 
-// function getLotInfo(values: any) {
-//   const {
-//     firstName,
-//     lastName,
-//     fullAddress,
-//     birthDate,
-//     email,
-//     mobileNumber,
-//     landlineNumber,
-//     dateOfPayment,
-//     receipt,
-//     ...lot
-//   } = values;
-//   return lot;
-// }
-
-// async function handleUploadReceipt(receipt: File) {
-//   try {
-//     const { env } = useEnv()
-//     const formData = new FormData();
-//     formData.append("api_key", env.VITE_CLOUDINARY_API_KEY);
-//     formData.append("file", receipt);
-//     formData.append("upload_preset", env.VITE_CLOUDINARY_UPLOAD_PRESET);
-//     const response: any = await $fetch(
-//       `https://api.cloudinary.com/v1_1/${config.public.cloudinary.cloudName}/image/upload`,
-//       {
-//         method: "POST",
-//         body: formData,
-//       }
-//     );
-//     return response.public_id;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
+async function handleUploadReceipt(receipt: File) {
+  try {
+    const { env } = useEnv();
+    const formData = new FormData();
+    formData.append("api_key", env.VITE_CLOUDINARY_API_KEY);
+    formData.append("file", receipt);
+    formData.append("upload_preset", env.VITE_CLOUDINARY_UPLOAD_PRESET);
+    await uploadReceipt(
+      `https://api.cloudinary.com/v1_1/${env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        data: formData,
+      },
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 async function handleCreateClientLot(values: any) {
-  console.log(values);
-  // try {
-  //   const { user } = useAuthenticationStore();
-  //   const body = {
-  //     ...values,
-  //     createdBy: `${user?.data.firstName} ${user?.data.lastName}`,
-  //     createdOn: useDateFormat(now(), "YYYY-MM-DD").value,
-  //   };
-  //   await execute({ method: "POST", data: body });
-  //   toast.success(data.value.message);
-  //   dialogState.value = false;
-  //   emit("refresh");
-  // } catch (error: unknown) {
-  //   if (error instanceof AxiosError) {
-  //     throw new Error(error.response?.data.message);
-  //   }
-  // }
+  try {
+    const { user } = useAuthenticationStore();
+    const createdBy = `${user?.data.firstName} ${user?.data.lastName}`;
+    const createdOn = useDateFormat(now(), "YYYY-MM-DD").value;
+
+    let body = {};
+
+    body = {
+      ...values,
+      clientId,
+      monthsToPay: values.terms,
+      balance: values.actualPrice - values.downpaymentPrice,
+      createdBy,
+      createdOn,
+    };
+
+    await createClientLotRecord("/client-lots/diwi", {
+      method: "POST",
+      data: body,
+    });
+
+    await handleUploadReceipt(values.receipt);
+
+    body = {
+      ...values,
+      payment: values.downpaymentPrice,
+      clientLotId: newClientLotRecordData.value.clientLot.id,
+      purpose: "Downpayment",
+      receipt: newReceipt.value.public_id,
+      createdBy,
+      createdOn,
+    };
+    await createInvoice("/invoices", { method: "POST", data: body });
+
+    toast.success(newClientLotRecordData.value.message);
+    dialogState.value = false;
+    emit("refresh");
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message);
+    }
+  }
 }
 </script>
