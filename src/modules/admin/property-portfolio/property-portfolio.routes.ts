@@ -1,11 +1,11 @@
 import { ROLES, SIDEBARGROUPS } from "@/lib/constants";
 import { MapPin } from "lucide-vue-next";
 
-export const propertiesModuleRoutes = [
+export const propertyPortfolioModuleRoutes = [
   {
     path: "/properties",
     name: "Property Portfolio",
-    component: () => import("./Properties.vue"),
+    component: () => import("./pages/properties/Properties.vue"),
     meta: {
       access: [ROLES.admin],
       group: SIDEBARGROUPS.admin,
@@ -15,6 +15,6 @@ export const propertiesModuleRoutes = [
   {
     path: "/properties/:id",
     name: "Property",
-    component: () => import("./pages/Property.vue"),
+    component: () => import("./pages/property/Property.vue"),
   },
 ];

@@ -5,11 +5,14 @@
         <h1 class="text-3xl font-semibold">Property Portfolio</h1>
         <Badge variant="outline"
           >Total available lots:
-          {{ isLoading ? "_" : data.totalAvailableLots }}</Badge
-        >
+          <Loader2 v-if="isLoading" class="animate-spin" />
+          <template v-else>{{ data.totalAvailableLots }}</template>
+        </Badge>
         <Badge variant="outline"
-          >Total taken lots: {{ isLoading ? "_" : data.totalTakenLots }}</Badge
-        >
+          >Total taken lots:
+          <Loader2 v-if="isLoading" class="animate-spin" />
+          <template v-else>{{ data.totalTakenLots }}</template>
+        </Badge>
       </div>
       <p class="text-muted-foreground text-sm">
         Here's a list of all your property ownings
@@ -36,7 +39,7 @@ import { useGuardedAxiosInstance } from "@/lib/axios";
 import { type VisibilityState, type ColumnDef } from "@tanstack/vue-table";
 import { useStorage } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
-import { ArrowUpDown } from "lucide-vue-next";
+import { ArrowUpDown, Loader2 } from "lucide-vue-next";
 import { h } from "vue";
 import type { Property } from "./properties.types";
 import { Badge } from "@/components/ui/badge";

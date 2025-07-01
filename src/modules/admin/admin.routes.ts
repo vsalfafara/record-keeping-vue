@@ -1,7 +1,7 @@
 import { accessManagementModuleRoutes } from "./access-management/access-management";
-import { propertiesModuleRoutes } from "./property-portfolio/properties/properties.routes";
+import { propertyPortfolioModuleRoutes } from "./property-portfolio/property-portfolio.routes";
 
 export const adminModuleRoutes = [
-  ...propertiesModuleRoutes,
+  ...propertyPortfolioModuleRoutes,
   ...accessManagementModuleRoutes,
 ];
