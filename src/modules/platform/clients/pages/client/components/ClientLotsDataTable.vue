@@ -18,6 +18,7 @@ import { ArrowUpDown } from "lucide-vue-next";
 import { h } from "vue";
 import { useRoute } from "vue-router";
 import AddClientLotDialog from "./AddClientLotDialog.vue";
+import EditClientLotSheet from "./EditClientLotSheet.vue";
 
 type ClientLotColumns = {
   id: number;
@@ -201,17 +202,19 @@ const columns: ColumnDef<ClientLotColumns>[] = [
     },
     cell: ({ row }) => row.getValue("createdOn"),
   },
-  // {
-  //   id: "actions",
-  //   enableHiding: false,
-  //   cell: ({ row }) => {
-  //     const { id: blockId } = row.original;
-  //     const actions = [];
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const { id: clientLotId } = row.original;
+      const actions = [];
 
-  //     actions.push(h(EditBlockSheet, { blockId, onRefresh: () => execute() }));
+      actions.push(
+        h(EditClientLotSheet, { clientLotId, onRefresh: () => execute() }),
+      );
 
-  //     return h("div", { class: "flex gap-2 justify-end" }, actions);
-  //   },
-  // },
+      return h("div", { class: "flex gap-2 justify-end" }, actions);
+    },
+  },
 ];
 </script>

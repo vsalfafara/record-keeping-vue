@@ -1,10 +1,18 @@
 <template>
   <Form
-    v-slot="{ handleSubmit, setFieldValue, values }"
+    v-slot="{ handleSubmit, setFieldValue, resetForm, values }"
     :validation-schema="formSchema"
     as=""
   >
-    <Dialog :open="dialogState" @update:open="(state) => (dialogState = state)">
+    <Dialog
+      :open="dialogState"
+      @update:open="
+        (state) => {
+          dialogState = state;
+          if (!state) resetForm();
+        }
+      "
+    >
       <DialogTrigger as-child>
         <Button variant="info"> <Plus /> Add Lot </Button>
       </DialogTrigger>
@@ -568,7 +576,6 @@ import { useGuardedAxiosInstance } from "@/lib/axios";
 import { toTypedSchema } from "@vee-validate/zod";
 import { now, useDateFormat, useFileDialog } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
-// import { AxiosError } from "axios";
 import { Plus, CalendarIcon, CloudUpload, Loader2 } from "lucide-vue-next";
 import { ref } from "vue";
 import { toast } from "vue-sonner";
@@ -884,7 +891,10 @@ async function handleCreateClientLot(values: any) {
       ...values,
       clientId,
       monthsToPay: values.terms,
-      balance: values.actualPrice - values.downpaymentPrice,
+      balance:
+        Math.round(
+          (values.actualPrice - values.downpaymentPrice + Number.EPSILON) * 100,
+        ) / 100,
       createdBy,
       createdOn,
     };
