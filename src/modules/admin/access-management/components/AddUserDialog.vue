@@ -1,6 +1,10 @@
 <template>
   <Form v-slot="{ handleSubmit }" :validation-schema="formSchema" as="">
-    <Dialog :open="dialogState" @update:open="(state) => (dialogState = state)">
+    <Dialog
+      modal
+      :open="dialogState"
+      @update:open="(state) => (dialogState = state)"
+    >
       <DialogTrigger as-child>
         <Button variant="info"> <Plus /> Add User </Button>
       </DialogTrigger>

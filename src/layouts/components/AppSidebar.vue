@@ -33,7 +33,7 @@
                       as-child
                       :is-active="activeRoute.name === route.name"
                       @click="handleNavigate(route.name)"
-                      class="cursor-pointer"
+                      class="mb-1 cursor-pointer"
                     >
                       <div>
                         <component :is="route.meta?.icon" />

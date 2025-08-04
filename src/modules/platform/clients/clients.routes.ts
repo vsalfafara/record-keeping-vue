@@ -5,7 +5,7 @@ export const clientsModuleRoutes = [
   {
     path: "/clients",
     name: "Clients",
-    component: () => import("./Clients.vue"),
+    component: () => import("./pages/clients/Clients.vue"),
     meta: {
       access: [ROLES.admin, ROLES.accountsClerk],
       group: SIDEBARGROUPS.platform,
@@ -15,6 +15,6 @@ export const clientsModuleRoutes = [
   {
     path: "/clients/:id",
     name: "Client",
-    component: () => import("./pages/Client.vue"),
+    component: () => import("./pages/client/Client.vue"),
   },
 ];

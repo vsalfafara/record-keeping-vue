@@ -31,7 +31,7 @@ import { useStorage } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { ArrowUpDown } from "lucide-vue-next";
 import { h } from "vue";
-import { type Client } from "./clients.types";
+import { type Client } from "../../clients.types";
 import AddClientDialog from "./components/AddClientDialog.vue";
 import EditClientButton from "./components/EditClientButton.vue";
 
