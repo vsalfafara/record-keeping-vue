@@ -1,9 +1,22 @@
 <template>
-  <DataTable enable-filter :data :isLoading :columns :visibleColumns>
-    <template #actions>
-      <AddClientLotDialog :client-id="Number(params.id)" @refresh="execute()" />
-    </template>
-  </DataTable>
+  <div>
+    <p class="text-info">Property Information</p>
+    <DataTable
+      enable-pagination
+      enable-filter
+      :data
+      :is-loading
+      :columns
+      :visibleColumns
+    >
+      <template #actions>
+        <AddClientLotDialog
+          :client-id="Number(params.id)"
+          @refresh="execute()"
+        />
+      </template>
+    </DataTable>
+  </div>
 </template>
 
 <script setup lang="ts">

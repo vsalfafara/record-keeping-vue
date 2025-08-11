@@ -1,7 +1,14 @@
 <template>
-  <DataTable enable-filter :data :isLoading :columns :visibleColumns>
+  <DataTable
+    enable-pagination
+    enable-filter
+    :columns
+    :data
+    :is-loading
+    :visibleColumns
+  >
     <template #actions>
-      <AddBlockDialog @refresh="execute()" />
+      <AddClientDialog @refresh="execute" />
     </template>
   </DataTable>
 </template>
@@ -10,41 +17,31 @@
 import { DataTable } from "@/components/custom/data-table";
 import { Button } from "@/components/ui/button";
 import { useGuardedAxiosInstance } from "@/lib/axios";
-import type { ColumnDef, VisibilityState } from "@tanstack/vue-table";
+import { type VisibilityState, type ColumnDef } from "@tanstack/vue-table";
 import { useStorage } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { ArrowUpDown } from "lucide-vue-next";
 import { h } from "vue";
-import { useRoute } from "vue-router";
-import AddBlockDialog from "./AddBlockDialog.vue";
-import EditBlockSheet from "./EditBlockSheet.vue";
+import { type Client } from "../../../clients.types";
+import AddClientDialog from "./AddClientDialog.vue";
+import EditClientButton from "./EditClientButton.vue";
 
-type BlockColumns = {
-  id: number;
-  name: string;
-  numberOfLots: number;
-  takenLots: number;
-  availableLots: number;
-  createdBy: number;
-  createdOn: number;
-};
-
-const { params } = useRoute();
 const visibleColumns = useStorage<VisibilityState>(
-  "blocks-table",
+  "clients-table",
   {},
   localStorage,
 );
+
 const { data, execute, isLoading } = useAxios(
-  `/properties/${params.id}/blocks`,
+  "/clients",
   useGuardedAxiosInstance(),
 );
 
-const columns: ColumnDef<BlockColumns>[] = [
+const columns: ColumnDef<Client>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "firstName",
     enableSorting: true,
-    meta: "Name",
+    meta: "First Name",
     header: ({ column }) => {
       return h(
         Button,
@@ -52,15 +49,15 @@ const columns: ColumnDef<BlockColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["First Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("name"),
+    cell: ({ row }) => row.getValue("firstName"),
   },
   {
-    accessorKey: "numberOfLots",
+    accessorKey: "lastName",
     enableSorting: true,
-    meta: "# of Lots",
+    meta: "Last Name",
     header: ({ column }) => {
       return h(
         Button,
@@ -68,15 +65,15 @@ const columns: ColumnDef<BlockColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["# of Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["Last Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("numberOfLots"),
+    cell: ({ row }) => row.getValue("lastName"),
   },
   {
-    accessorKey: "takenLots",
+    accessorKey: "birthDate",
     enableSorting: true,
-    meta: "Taken Lots",
+    meta: "Birth Date",
     header: ({ column }) => {
       return h(
         Button,
@@ -84,15 +81,15 @@ const columns: ColumnDef<BlockColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Taken Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["Birth Date", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("takenLots"),
+    cell: ({ row }) => row.getValue("birthDate"),
   },
   {
-    accessorKey: "availableLots",
+    accessorKey: "email",
     enableSorting: true,
-    meta: "Available Lots",
+    meta: "Email",
     header: ({ column }) => {
       return h(
         Button,
@@ -100,10 +97,58 @@ const columns: ColumnDef<BlockColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Available Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["Email", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("availableLots"),
+    cell: ({ row }) => row.getValue("email"),
+  },
+  {
+    accessorKey: "fullAddress",
+    enableSorting: true,
+    meta: "Full Address",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Full Address", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+      );
+    },
+    cell: ({ row }) => row.getValue("fullAddress"),
+  },
+  {
+    accessorKey: "mobileNumber",
+    enableSorting: true,
+    meta: "Mobile Number",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Mobile Number", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+      );
+    },
+    cell: ({ row }) => row.getValue("mobileNumber"),
+  },
+  {
+    accessorKey: "landlineNumber",
+    enableSorting: true,
+    meta: "Landline Number",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Landline Number", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+      );
+    },
+    cell: ({ row }) => row.getValue("landlineNumber"),
   },
   {
     accessorKey: "createdBy",
@@ -141,10 +186,10 @@ const columns: ColumnDef<BlockColumns>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const { id: blockId } = row.original;
+      const { id } = row.original;
       const actions = [];
 
-      actions.push(h(EditBlockSheet, { blockId, onRefresh: () => execute() }));
+      actions.push(h(EditClientButton, { id }));
 
       return h("div", { class: "flex gap-2 justify-end" }, actions);
     },

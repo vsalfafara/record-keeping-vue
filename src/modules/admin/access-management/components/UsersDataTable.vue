@@ -2,14 +2,13 @@
   <DataTable
     enable-pagination
     enable-filter
-    :data
-    :isLoading
     :columns
+    :data
+    :is-loading
     :visibleColumns
-    lots-max-height
   >
     <template #actions>
-      <AddLotDialog :blockId @refresh="execute()" />
+      <AddUserDialog @refresh="execute" />
     </template>
   </DataTable>
 </template>
@@ -17,48 +16,36 @@
 <script setup lang="ts">
 import { DataTable } from "@/components/custom/data-table";
 import { Button } from "@/components/ui/button";
-import EditLotDialog from "./EditLotDialog.vue";
 import { useGuardedAxiosInstance } from "@/lib/axios";
-import type { ColumnDef, VisibilityState } from "@tanstack/vue-table";
+import { type VisibilityState, type ColumnDef } from "@tanstack/vue-table";
 import { useStorage } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { ArrowUpDown } from "lucide-vue-next";
 import { h } from "vue";
-import AddLotDialog from "./AddLotDialog.vue";
-import { Badge } from "@/components/ui/badge";
-import { RemarksTooltip } from "@/components/custom/remarks-tooltip";
+import AddUserDialog from "./AddUserDialog.vue";
+import type { User } from "../access-management.types";
+import EditUserDialog from "./EditUserDialog.vue";
+import { useAuthenticationStore } from "@/authentication/authentication.store";
+import DeleteUserDialog from "./DeleteUserDialog.vue";
 
-type LotColumns = {
-  id: number;
-  name: string;
-  lotType: string;
-  price: number;
-  taken: boolean;
-  remarks: string;
-  createdBy: number;
-  createdOn: number;
-};
+const { getUser } = useAuthenticationStore();
 
-type LotsProps = {
-  blockId: number;
-};
-
-const { blockId } = defineProps<LotsProps>();
 const visibleColumns = useStorage<VisibilityState>(
-  "lots-table",
+  "users-table",
   {},
   localStorage,
 );
+
 const { data, execute, isLoading } = useAxios(
-  `/blocks/${blockId}/lots`,
+  "/users",
   useGuardedAxiosInstance(),
 );
 
-const columns: ColumnDef<LotColumns>[] = [
+const columns: ColumnDef<User>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "firstName",
     enableSorting: true,
-    meta: "Name",
+    meta: "First Name",
     header: ({ column }) => {
       return h(
         Button,
@@ -66,15 +53,15 @@ const columns: ColumnDef<LotColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["First Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("name"),
+    cell: ({ row }) => row.getValue("firstName"),
   },
   {
-    accessorKey: "lotType",
+    accessorKey: "lastName",
     enableSorting: true,
-    meta: "Lot Type",
+    meta: "Last Name",
     header: ({ column }) => {
       return h(
         Button,
@@ -82,17 +69,15 @@ const columns: ColumnDef<LotColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Lot Type", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["Last Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("lotType"),
+    cell: ({ row }) => row.getValue("lastName"),
   },
   {
-    accessorKey: "price",
+    accessorKey: "role",
     enableSorting: true,
-    enableColumnFilter: false,
-    enableGlobalFilter: false,
-    meta: "Price",
+    meta: "Role",
     header: ({ column }) => {
       return h(
         Button,
@@ -100,29 +85,15 @@ const columns: ColumnDef<LotColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Price", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["Role", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => row.getValue("price"),
+    cell: ({ row }) => row.getValue("role"),
   },
   {
-    accessorKey: "taken",
-    enableSorting: false,
-    enableColumnFilter: false,
-    enableGlobalFilter: false,
-    meta: "Is Taken",
-    header: "Is Taken",
-    cell: ({ row }) => {
-      const isTaken = row.getValue("taken");
-      const value = isTaken ? "Taken" : "Not Taken";
-      const variant = isTaken ? "success" : "destructive";
-      return h(Badge, { variant }, () => value);
-    },
-  },
-  {
-    accessorKey: "remarks",
+    accessorKey: "email",
     enableSorting: true,
-    meta: "Remarks",
+    meta: "Email",
     header: ({ column }) => {
       return h(
         Button,
@@ -130,14 +101,10 @@ const columns: ColumnDef<LotColumns>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Remarks", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+        () => ["Email", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
       );
     },
-    cell: ({ row }) => {
-      const remarks: string = row.getValue("remarks");
-      if (remarks) return h(RemarksTooltip, { remarks });
-      return remarks;
-    },
+    cell: ({ row }) => row.getValue("email"),
   },
   {
     accessorKey: "createdBy",
@@ -175,10 +142,16 @@ const columns: ColumnDef<LotColumns>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const lot: any = row.original;
+      const user = row.original;
       const actions = [];
 
-      actions.push(h(EditLotDialog, { lot, onRefresh: () => execute() }));
+      actions.push(h(EditUserDialog, { user, onRefresh: () => execute() }));
+
+      if (getUser.value?.data.id !== user.id) {
+        actions.push(
+          h(DeleteUserDialog, { id: user.id, onRefresh: () => execute() }),
+        );
+      }
 
       return h("div", { class: "flex gap-2 justify-end" }, actions);
     },

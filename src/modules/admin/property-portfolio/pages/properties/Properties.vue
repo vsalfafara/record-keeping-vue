@@ -19,9 +19,10 @@
       </p>
     </div>
     <DataTable
+      enable-pagination
       enable-filter
       :columns
-      :data="data?.properties || []"
+      :data="data?.properties"
       :is-loading
       :visibleColumns
     >

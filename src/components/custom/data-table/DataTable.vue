@@ -57,8 +57,12 @@
       <slot name="actions" />
     </div>
     <div
-      class="rounded-md border"
-      :class="{ 'max-h-[calc(100dvh-400px)] overflow-y-auto': maxHeight }"
+      :class="
+        cn('overflow-y-auto rounded-md border', {
+          'max-h-[calc(100dvh-400px)]': lotsMaxHeight,
+          'max-h-[calc(100dvh-500px)]': clientLotMaxHeight,
+        })
+      "
     >
       <Table>
         <TableHeader>
@@ -103,7 +107,10 @@
         </TableBody>
       </Table>
     </div>
-    <div class="flex items-center justify-end space-x-2 py-4">
+    <div
+      v-if="enablePagination"
+      class="flex items-center justify-end space-x-2 py-4"
+    >
       <div class="space-x-2">
         <Button
           variant="outline"
@@ -134,7 +141,7 @@ import type {
   SortingState,
   VisibilityState,
 } from "@tanstack/vue-table";
-import { valueUpdater } from "@/lib/utils";
+import { cn, valueUpdater } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -175,8 +182,10 @@ type DataTableProps = {
   data: any[];
   isLoading: boolean;
   visibleColumns?: VisibilityState;
-  maxHeight?: boolean;
+  clientLotMaxHeight?: boolean;
+  lotsMaxHeight?: boolean;
   enableFilter?: boolean;
+  enablePagination?: boolean;
 };
 
 const {
@@ -184,8 +193,10 @@ const {
   data = [],
   isLoading = false,
   enableFilter = false,
+  enablePagination = false,
   visibleColumns = {},
-  maxHeight = false,
+  clientLotMaxHeight = false,
+  lotsMaxHeight = false,
 } = defineProps<DataTableProps>();
 
 const search = ref<any>();
@@ -204,7 +215,9 @@ function initializeTable() {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    getPaginationRowModel: enablePagination
+      ? getPaginationRowModel()
+      : undefined,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getExpandedRowModel: getExpandedRowModel(),

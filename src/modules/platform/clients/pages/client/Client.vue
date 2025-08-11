@@ -1,10 +1,7 @@
 <template>
   <div class="grid gap-4">
     <EditClientCard />
-    <div>
-      <p class="text-info">Property Information</p>
-      <ClientLotsDataTable />
-    </div>
+    <ClientLotsDataTable />
   </div>
 </template>
 

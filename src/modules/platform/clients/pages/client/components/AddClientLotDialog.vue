@@ -625,6 +625,15 @@ const {
 } = useAxios("", useGuardedAxiosInstance(), {
   immediate: false,
 });
+
+const {
+  data: paymentPlanRecords,
+  execute: createPaymentPlanRecords,
+  isLoading: isCreatePaymentPlanRecordsLoading,
+} = useAxios("", useGuardedAxiosInstance(), {
+  immediate: false,
+});
+
 const {
   data: newReceipt,
   execute: uploadReceipt,
@@ -899,10 +908,29 @@ async function handleCreateClientLot(values: any) {
       createdOn,
     };
 
-    await createClientLotRecord("/client-lots/diwi", {
-      method: "POST",
-      data: body,
-    });
+    if (values.paymentType === "Monthly Terms") {
+      await createClientLotRecord("/client-lots/diwi", {
+        method: "POST",
+        data: body,
+      });
+
+      body = {
+        paymentDue: values.monthly,
+        dateOfPayment: values.dateOfPayment,
+        installmentMonths: values.terms,
+        withInterest:
+          values.paymentPlan !==
+          "Downpayment and Installment (without interest)",
+      };
+
+      await createPaymentPlanRecords(
+        `/client-lots/${newClientLotRecordData.value.clientLot.id}/payment-plan`,
+        {
+          method: "POST",
+          data: body,
+        },
+      );
+    }
 
     await handleUploadReceipt(values.receipt);
 
