@@ -13,7 +13,7 @@
         </p>
       </SheetDescription>
     </SheetHeader>
-    <Form v-slot="{ handleSubmit }">
+    <Form>
       <div class="grid grid-cols-6 gap-2">
         <FormField name="propertyName">
           <FormItem>
@@ -241,22 +241,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useGuardedAxiosInstance } from "@/lib/axios";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { Pencil } from "lucide-vue-next";
-import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
-import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { inject } from "vue";
 
 const clientLotId = inject("clientLotId");
 
-const { data, execute, isLoading } = useAxios(
+const { data, isLoading } = useAxios(
   `/client-lots/${clientLotId}`,
   useGuardedAxiosInstance(),
 );
-
-const formSchema = toTypedSchema(z.object({}));
-
-const form = useForm({});
-
-async function handleUpdateClientLot() {}
 </script>

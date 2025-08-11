@@ -31,7 +31,7 @@ type PaymentPlanColumns = {
 
 const clientLotId = inject("clientLotId");
 
-const { data, isLoading, execute } = useAxios(
+const { data, isLoading } = useAxios(
   `/client-lots/${clientLotId}/payment-plan`,
   useGuardedAxiosInstance(),
 );

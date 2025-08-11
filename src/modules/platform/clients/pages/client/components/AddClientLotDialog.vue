@@ -626,13 +626,13 @@ const {
   immediate: false,
 });
 
-const {
-  data: paymentPlanRecords,
-  execute: createPaymentPlanRecords,
-  isLoading: isCreatePaymentPlanRecordsLoading,
-} = useAxios("", useGuardedAxiosInstance(), {
-  immediate: false,
-});
+const { execute: createPaymentPlanRecords } = useAxios(
+  "",
+  useGuardedAxiosInstance(),
+  {
+    immediate: false,
+  },
+);
 
 const {
   data: newReceipt,
