@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-info">Blocks</p>
+    <p class="text-info font-semibold">Blocks</p>
     <DataTable
       enable-pagination
       enable-filter
