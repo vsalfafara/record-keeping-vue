@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-info">Property Information</p>
+    <p class="text-info font-semibold">Property Information</p>
     <DataTable
       enable-pagination
       enable-filter
