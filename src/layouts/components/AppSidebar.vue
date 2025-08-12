@@ -12,7 +12,9 @@
       <template v-for="(group, index) in groupedRoutes" :key="group.name">
         <Collapsible
           :default-open="
-            !!group.routes.find((route) => activeRoute.name === route.name)
+            !!group.routes.find((route) =>
+              route.path.split('/')[1].includes(activeRoute.path.split('/')[1]),
+            )
           "
           class="group/collapsible"
         >
@@ -31,7 +33,11 @@
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       as-child
-                      :is-active="activeRoute.name === route.name"
+                      :is-active="
+                        route.path
+                          .split('/')[1]
+                          .includes(activeRoute.path.split('/')[1])
+                      "
                       @click="handleNavigate(route.name)"
                       class="mb-1 cursor-pointer"
                     >

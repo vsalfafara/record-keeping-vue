@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="grid gap-y-6">
     <div class="grid gap-y-4">
       <h1 class="text-3xl font-semibold">
         <Skeleton v-if="!data?.firstName || !data?.lastName" class="h-9 w-52" />
