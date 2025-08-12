@@ -510,26 +510,29 @@
             type="submit"
             form="add-client-lot-form"
             :disabled="
-              isCreateClientRecordLotLoading ||
+              isCreateClientLotRecordLoading ||
               isUploadReceiptLoading ||
               isCreateInvoiceLoading
             "
           >
             <Loader2
               v-if="
-                isCreateClientRecordLotLoading ||
+                isCreateClientLotRecordLoading ||
                 isUploadReceiptLoading ||
                 isCreateInvoiceLoading
               "
               class="animate-spin"
             />
-            {{
-              isCreateClientRecordLotLoading ||
-              isUploadReceiptLoading ||
-              isCreateInvoiceLoading
-                ? "Creating client lot record..."
-                : "Confirm"
-            }}
+            <template v-if="isUploadReceiptLoading"
+              >Uploading receipt...</template
+            >
+            <template v-else-if="isCreateClientLotRecordLoading"
+              >Creating client lot record...</template
+            >
+            <template v-else-if="isCreateInvoiceLoading"
+              >Creating invoice record...</template
+            >
+            <template v-else>Confirm</template>
           </Button>
         </DialogFooter>
       </DialogScrollContent>
@@ -621,7 +624,7 @@ const {
 const {
   data: newClientLotRecordData,
   execute: createClientLotRecord,
-  isLoading: isCreateClientRecordLotLoading,
+  isLoading: isCreateClientLotRecordLoading,
 } = useAxios("", useGuardedAxiosInstance(), {
   immediate: false,
 });
@@ -884,6 +887,7 @@ async function handleUploadReceipt(receipt: File) {
       },
     );
   } catch (error) {
+    toast.error("Something went wrong with uploading the receipt...");
     console.log(error);
   }
 }
@@ -893,6 +897,8 @@ async function handleCreateClientLot(values: any) {
     const { user } = useAuthenticationStore();
     const createdBy = `${user?.data.firstName} ${user?.data.lastName}`;
     const createdOn = useDateFormat(now(), "YYYY-MM-DD").value;
+
+    await handleUploadReceipt(values.receipt);
 
     let body = {};
 
@@ -932,8 +938,6 @@ async function handleCreateClientLot(values: any) {
       );
     }
 
-    await handleUploadReceipt(values.receipt);
-
     body = {
       ...values,
       payment: values.downpaymentPrice,
@@ -943,13 +947,17 @@ async function handleCreateClientLot(values: any) {
       createdBy,
       createdOn,
     };
-    await createInvoice("/invoices", { method: "POST", data: body });
+    await createInvoice(
+      `/client-lots/${newClientLotRecordData.value.clientLot.id}/invoices`,
+      { method: "POST", data: body },
+    );
 
     toast.success(newClientLotRecordData.value.message);
     dialogState.value = false;
     emit("refresh");
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
+      toast.error("Something went wrong with creating this record...");
       throw new Error(error.response?.data.message);
     }
   }

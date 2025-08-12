@@ -48,7 +48,7 @@
         </form>
         <div class="max-w-full overflow-y-auto">
           <p class="text-info">Lots</p>
-          <Lots :blockId />
+          <LotsDataTable :blockId />
         </div>
       </div>
     </SheetContent>
@@ -83,7 +83,7 @@ import { useForm } from "vee-validate";
 import { ref, watch } from "vue";
 import { toast } from "vue-sonner";
 import { z } from "zod";
-import Lots from "./Lots.vue";
+import LotsDataTable from "./LotsDataTable.vue";
 
 type EditBlockSheetProps = {
   blockId: number;

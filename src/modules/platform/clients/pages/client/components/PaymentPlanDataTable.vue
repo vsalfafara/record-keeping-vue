@@ -68,7 +68,7 @@ const columns: ColumnDef<PaymentPlanColumns>[] = [
             "bg-slate-500 text-white": status === "Pending",
           },
         },
-        row.getValue("status"),
+        () => row.getValue("status"),
       );
     },
   },
