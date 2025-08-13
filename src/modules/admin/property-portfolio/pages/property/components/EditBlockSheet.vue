@@ -4,7 +4,7 @@
     @update:open="
       (state: boolean) => {
         dialogState = state;
-        if (state: boolean) {
+        if (state) {
           execute();
         }
       }
