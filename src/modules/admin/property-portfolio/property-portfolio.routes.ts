@@ -16,5 +16,8 @@ export const propertyPortfolioModuleRoutes = [
     path: "/properties/:id",
     name: "Property",
     component: () => import("./pages/property/Property.vue"),
+    meta: {
+      access: [ROLES.admin],
+    },
   },
 ];

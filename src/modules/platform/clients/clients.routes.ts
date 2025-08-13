@@ -16,5 +16,8 @@ export const clientsModuleRoutes = [
     path: "/clients/:id",
     name: "Client",
     component: () => import("./pages/client/Client.vue"),
+    meta: {
+      access: [ROLES.admin, ROLES.accountsClerk],
+    },
   },
 ];
