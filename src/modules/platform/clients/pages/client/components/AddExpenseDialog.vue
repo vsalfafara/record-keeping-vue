@@ -59,6 +59,7 @@
                   <Input
                     class="pl-6"
                     type="number"
+                    step=".01"
                     placeholder="0.00"
                     v-bind="componentField"
                   />

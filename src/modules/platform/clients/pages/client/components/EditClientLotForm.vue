@@ -47,6 +47,7 @@
                 <Input
                   class="pl-6"
                   type="number"
+                  step=".01"
                   :value="data?.reservation"
                   disabled
                 />
@@ -95,6 +96,7 @@
                 <Input
                   class="pl-6"
                   type="number"
+                  step=".01"
                   :value="data?.downpaymentPrice"
                   disabled
                 />
@@ -113,6 +115,7 @@
                 <Input
                   class="pl-6"
                   type="number"
+                  step=".01"
                   :value="data?.discount"
                   disabled
                 />
@@ -137,6 +140,7 @@
                 <Input
                   class="pl-6"
                   type="number"
+                  step=".01"
                   :value="data?.monthly"
                   disabled
                 />
@@ -153,6 +157,7 @@
                 <Input
                   class="pl-6"
                   type="number"
+                  step=".01"
                   :value="data?.totalInterest"
                   disabled
                 />
@@ -171,6 +176,7 @@
                 <Input
                   class="pl-6"
                   type="number"
+                  step=".01"
                   :value="data?.lot.price"
                   disabled
                 />
@@ -187,6 +193,7 @@
                 <Input
                   class="pl-6"
                   type="number"
+                  step=".01"
                   :value="data?.actualPrice"
                   disabled
                 />

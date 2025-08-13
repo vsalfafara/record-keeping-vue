@@ -272,6 +272,7 @@
                       <Input
                         class="pl-6"
                         type="number"
+                        step=".01"
                         :placeholder="values.downpaymentPrice"
                         v-bind="componentField"
                         :disabled="values.downpayment > 0 || !values.terms"
@@ -293,6 +294,7 @@
                       <Input
                         class="pl-6"
                         type="number"
+                        step=".01"
                         placeholder="0.00"
                         default-value="0"
                         v-bind="componentField"
@@ -316,6 +318,7 @@
                       <Input
                         class="pl-6"
                         type="number"
+                        step=".01"
                         :placeholder="values.monthly"
                         v-bind="componentField"
                         disabled
@@ -327,12 +330,13 @@
               </FormField>
               <FormField v-slot="{ componentField }" name="totalInterest">
                 <FormItem>
-                  <FormLabel> Total Interest </FormLabel>
+                  <FormLabel>Total Interest</FormLabel>
                   <FormControl>
                     <div class="relative flex items-center">
                       <Input
                         class="pl-6"
                         type="number"
+                        step=".01"
                         :placeholder="values.totalInterest"
                         v-bind="componentField"
                         disabled
@@ -350,6 +354,7 @@
                       <Input
                         class="pl-6"
                         type="number"
+                        step=".01"
                         :placeholder="values.lotPrice"
                         v-bind="componentField"
                         disabled
@@ -367,6 +372,7 @@
                       <Input
                         class="pl-6"
                         type="number"
+                        step=".01"
                         :placeholder="values.actualPrice"
                         v-bind="componentField"
                         disabled
