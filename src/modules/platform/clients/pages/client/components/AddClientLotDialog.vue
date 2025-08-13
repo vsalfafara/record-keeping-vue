@@ -894,11 +894,11 @@ async function handleUploadReceipt(receipt: File) {
 
 async function handleCreateClientLot(values: any) {
   try {
+    await handleUploadReceipt(values.receipt);
+
     const { user } = useAuthenticationStore();
     const createdBy = `${user?.data.firstName} ${user?.data.lastName}`;
     const createdOn = useDateFormat(now(), "YYYY-MM-DD").value;
-
-    await handleUploadReceipt(values.receipt);
 
     let body = {};
 

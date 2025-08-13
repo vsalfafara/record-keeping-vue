@@ -13,7 +13,7 @@
     <TabsContent value="interment"> Under construction... </TabsContent>
     <TabsContent value="perpetual-care"> Under construction... </TabsContent>
     <TabsContent value="invoices"> <InvoiceDataTable /> </TabsContent>
-    <TabsContent value="expenses"> Under construction... </TabsContent>
+    <TabsContent value="expenses"> <ExpensesDataTable /> </TabsContent>
   </Tabs>
 </template>
 
@@ -21,4 +21,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PaymentPlanDataTable from "./PaymentPlanDataTable.vue";
 import InvoiceDataTable from "./InvoiceDataTable.vue";
+import ExpensesDataTable from "./ExpensesDataTable.vue";
 </script>

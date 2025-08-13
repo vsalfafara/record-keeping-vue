@@ -8,7 +8,8 @@
       class="border-0 bg-transparent shadow-none"
     >
       <VisuallyHidden>
-        <DialogTitle></DialogTitle>
+        <DialogTitle />
+        <DialogDescription />
       </VisuallyHidden>
       <img :src="image" class="h-full w-auto" />
     </DialogContent>
@@ -20,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";

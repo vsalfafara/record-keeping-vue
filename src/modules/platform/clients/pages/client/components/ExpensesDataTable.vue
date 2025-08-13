@@ -8,7 +8,7 @@
     :visibleColumns
   >
     <template #actions>
-      <AddInvoiceDialog @refresh="execute" />
+      <AddExpenseDialog @refresh="execute" />
     </template>
   </DataTable>
 </template>
@@ -23,9 +23,9 @@ import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { ArrowUpDown } from "lucide-vue-next";
 import { h, inject } from "vue";
 import Receipt from "./Receipt.vue";
-import AddInvoiceDialog from "./AddInvoiceDialog.vue";
+import AddExpenseDialog from "./AddExpenseDialog.vue";
 
-type InvoiceColumns = {
+type ExpensesColumns = {
   purpose: string;
   payment: number;
   dateOfPayment: string;
@@ -38,17 +38,17 @@ type InvoiceColumns = {
 const clientLotId = inject("clientLotId");
 
 const { data, execute, isLoading } = useAxios(
-  `/client-lots/${clientLotId}/invoices`,
+  `/client-lots/${clientLotId}/expenses`,
   useGuardedAxiosInstance(),
 );
 
 const visibleColumns = useStorage<VisibilityState>(
-  "invoice-table",
+  "expenses-table",
   {},
   localStorage,
 );
 
-const columns: ColumnDef<InvoiceColumns>[] = [
+const columns: ColumnDef<ExpensesColumns>[] = [
   {
     accessorKey: "purpose",
     enableSorting: true,
