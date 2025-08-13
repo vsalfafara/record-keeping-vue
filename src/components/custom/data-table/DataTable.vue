@@ -56,14 +56,7 @@
       </DropdownMenu>
       <slot name="actions" />
     </div>
-    <ScrollArea
-      :class="
-        cn('overflow-auto rounded-md border', {
-          'h-[calc(100dvh-400px)]': lotsMaxHeight,
-          'h-[calc(100dvh-500px)]': clientLotMaxHeight,
-        })
-      "
-    >
+    <ScrollArea :lotsMaxHeight :clientLotMaxHeight>
       <Table>
         <TableHeader class="bg-background sticky top-0">
           <TableRow
@@ -142,7 +135,7 @@ import type {
   SortingState,
   VisibilityState,
 } from "@tanstack/vue-table";
-import { cn, valueUpdater } from "@/lib/utils";
+import { valueUpdater } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
