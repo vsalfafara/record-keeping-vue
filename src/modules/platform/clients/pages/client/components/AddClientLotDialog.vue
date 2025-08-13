@@ -7,7 +7,7 @@
     <Dialog
       :open="dialogState"
       @update:open="
-        (state) => {
+        (state: boolean) => {
           dialogState = state;
           if (!state) resetForm();
         }

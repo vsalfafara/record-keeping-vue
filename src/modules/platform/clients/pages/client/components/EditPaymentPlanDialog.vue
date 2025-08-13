@@ -5,7 +5,10 @@
     :validation-schema="formSchema"
     as=""
   >
-    <Dialog :open="dialogState" @update:open="(state) => (dialogState = state)">
+    <Dialog
+      :open="dialogState"
+      @update:open="(state: boolean) => (dialogState = state)"
+    >
       <DialogTrigger as-child>
         <Button variant="info" size="icon"> <Pencil /></Button>
       </DialogTrigger>
@@ -36,7 +39,6 @@
                     class="pl-6"
                     type="number"
                     step=".01"
-                    placeholder="0.00"
                     v-bind="componentField"
                   />
                   <span class="absolute pl-3"> ₱ </span>
@@ -53,7 +55,6 @@
                     class="pl-6"
                     type="number"
                     step=".01"
-                    placeholder="0.00"
                     v-bind="componentField"
                   />
                   <span class="absolute pl-3"> ₱ </span>
@@ -133,17 +134,17 @@ const formSchema = toTypedSchema(
   z.object({
     discount: z
       .number()
-      .min(0.01, { message: "Please enter a price that is more than 0" })
+      .gt(-1)
       .multipleOf(0.01, {
-        message: "Please enter a price with a decimal point of at most 2",
+        message: "Please enter a discount with a decimal point of at most 2",
       })
       .optional()
       .default(discount),
     penalty: z
       .number()
-      .min(0.01, { message: "Please enter a price that is more than 0" })
+      .gt(-1)
       .multipleOf(0.01, {
-        message: "Please enter a price with a decimal point of at most 2",
+        message: "Please enter a penalty with a decimal point of at most 2",
       })
       .optional()
       .default(penalty),

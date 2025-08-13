@@ -2,9 +2,9 @@
   <Sheet
     :open="dialogState"
     @update:open="
-      (state) => {
+      (state: boolean) => {
         dialogState = state;
-        if (state) {
+        if (state: boolean) {
           execute();
         }
       }

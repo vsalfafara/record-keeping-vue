@@ -7,7 +7,7 @@
     <Dialog
       modal
       :open="dialogState"
-      @update:open="(state) => (dialogState = state)"
+      @update:open="(state: boolean) => (dialogState = state)"
     >
       <DialogTrigger as-child>
         <Button variant="info"> <Plus /> Add Invoice </Button>

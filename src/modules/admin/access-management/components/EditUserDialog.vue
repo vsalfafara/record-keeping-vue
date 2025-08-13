@@ -6,7 +6,10 @@
     :validation-schema="formSchema"
     as=""
   >
-    <Dialog :open="dialogState" @update:open="(state) => (dialogState = state)">
+    <Dialog
+      :open="dialogState"
+      @update:open="(state: boolean) => (dialogState = state)"
+    >
       <DialogTrigger as-child>
         <Button variant="outline" size="icon"> <Pen /> </Button>
       </DialogTrigger>
