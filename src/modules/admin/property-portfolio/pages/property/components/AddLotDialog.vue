@@ -189,7 +189,6 @@ const formSchema = toTypedSchema(
 );
 
 async function handleCreateLot(values: any) {
-  console.log(values);
   try {
     const { user } = useAuthenticationStore();
     const body = {

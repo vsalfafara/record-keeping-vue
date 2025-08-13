@@ -61,7 +61,6 @@
                             'birthDate',
                             `${v.year}-${v.month}-${v.day}`,
                           );
-                          console.log(form.values);
                         }
                       }
                     "

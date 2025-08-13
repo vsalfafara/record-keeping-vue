@@ -18,8 +18,10 @@ import { useDateFormat, useStorage } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { ArrowUpDown } from "lucide-vue-next";
 import { h, inject } from "vue";
+import EditPaymentPlanDialog from "./EditPaymentPlanDialog.vue";
 
 type PaymentPlanColumns = {
+  id: number;
   status: string;
   installmentMonths: string;
   dueDate: string;
@@ -31,7 +33,7 @@ type PaymentPlanColumns = {
 
 const clientLotId = inject("clientLotId");
 
-const { data, isLoading } = useAxios(
+const { data, execute, isLoading } = useAxios(
   `/client-lots/${clientLotId}/payment-plan`,
   useGuardedAxiosInstance(),
 );
@@ -138,6 +140,25 @@ const columns: ColumnDef<PaymentPlanColumns>[] = [
       );
     },
     cell: ({ row }) => `₱${row.getValue("paid")}`,
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const { id: paymentPlanId, discount, penalty } = row.original;
+      const actions = [];
+
+      actions.push(
+        h(EditPaymentPlanDialog, {
+          paymentPlanId,
+          discount,
+          penalty,
+          onRefresh: execute,
+        }),
+      );
+
+      return h("div", { class: "flex gap-2 justify-end" }, actions);
+    },
   },
 ];
 </script>

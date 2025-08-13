@@ -56,16 +56,16 @@
       </DropdownMenu>
       <slot name="actions" />
     </div>
-    <div
+    <ScrollArea
       :class="
-        cn('overflow-y-auto rounded-md border', {
-          'max-h-[calc(100dvh-400px)]': lotsMaxHeight,
-          'max-h-[calc(100dvh-500px)]': clientLotMaxHeight,
+        cn('overflow-auto rounded-md border', {
+          'h-[calc(100dvh-400px)]': lotsMaxHeight,
+          'h-[calc(100dvh-500px)]': clientLotMaxHeight,
         })
       "
     >
       <Table>
-        <TableHeader>
+        <TableHeader class="bg-background sticky top-0">
           <TableRow
             v-for="headerGroup in table.getHeaderGroups()"
             :key="headerGroup.id"
@@ -106,7 +106,8 @@
           </TableRow>
         </TableBody>
       </Table>
-    </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
     <div
       v-if="enablePagination"
       class="flex items-center justify-end space-x-2 py-4"
@@ -176,6 +177,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type DataTableProps = {
   columns: ColumnDef<TData, TValue>[];
