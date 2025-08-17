@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const EnvSchema = z.object({
+  VITE_ENV: z.enum(["development", "uat", "production"]).default("development"),
   VITE_API: z.string(),
   VITE_CLOUDINARY_CLOUD_NAME: z.string(),
   VITE_CLOUDINARY_UPLOAD_PRESET: z.string(),

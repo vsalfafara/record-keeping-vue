@@ -790,6 +790,9 @@
             <template v-if="isUploadReceiptLoading"
               >Uploading receipt...</template
             >
+            <template v-else-if="isUpdateLotToTakenLoading">
+              Updating lot...
+            </template>
             <template v-else-if="isCreateClientLotRecordLoading"
               >Creating client lot record...</template
             >
@@ -884,6 +887,11 @@ const {
 } = useAxios("", useGuardedAxiosInstance(), {
   immediate: false,
 });
+
+const { execute: updateLotToTaken, isLoading: isUpdateLotToTakenLoading } =
+  useAxios("", useGuardedAxiosInstance(), {
+    immediate: false,
+  });
 
 const {
   data: clientLot,
@@ -1156,16 +1164,25 @@ async function handleUploadReceipt(receipt: File) {
   }
 }
 
-// @ts-ignore
 async function handleCreateClientLot(values: any) {
   try {
     await handleUploadReceipt(values.receipt);
 
     const { user } = useAuthenticationStore();
+    const { env } = useEnv();
     const createdBy = `${user?.data.firstName} ${user?.data.lastName}`;
     const createdOn = useDateFormat(now(), "YYYY-MM-DD").value;
 
     let body = {};
+
+    if (env.VITE_ENV !== "development") {
+      await updateLotToTaken(`/lots/${values.lotId}`, {
+        method: "put",
+        data: {
+          taken: true,
+        },
+      });
+    }
 
     body = {
       ...values,
