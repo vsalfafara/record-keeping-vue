@@ -9,7 +9,7 @@
       @update:open="
         (state: boolean) => {
           dialogState = state;
-          if (!state) resetForm();
+          if (state) resetForm();
         }
       "
     >
@@ -184,6 +184,22 @@
                     v-bind="componentField"
                     default-value="Reservation"
                     :orientation="'vertical'"
+                    @update:model-value="
+                      () => {
+                        const lot = lots.find(
+                          (lot: any) => lot.id === parseInt(values.lotId),
+                        );
+                        if (lot) {
+                          setFieldValue('lotPrice', lot.price);
+                          setFieldValue('actualPrice', lot.price);
+                        }
+                        setFieldValue('downpaymentPrice', 0);
+                        setFieldValue('monthly', 0);
+                        setFieldValue('totalInterest', 0);
+                        setFieldValue('downpayment', undefined, false);
+                        setFieldValue('terms', undefined, false);
+                      }
+                    "
                   >
                     <div
                       v-for="paymentPlan in paymentPlans"
@@ -285,7 +301,6 @@
                   </FormControl>
                 </FormItem>
               </FormField>
-
               <FormField v-slot="{ componentField }" name="discount">
                 <FormItem>
                   <FormLabel>Discount</FormLabel>
@@ -302,6 +317,249 @@
                           () => {
                             computeForMonthly(values, setFieldValue);
                             computeForDownpayment(values, setFieldValue);
+                          }
+                        "
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="monthly">
+                <FormItem>
+                  <FormLabel>Monthly</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        step=".01"
+                        :placeholder="values.monthly"
+                        v-bind="componentField"
+                        disabled
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="totalInterest">
+                <FormItem>
+                  <FormLabel>Total Interest</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        step=".01"
+                        :placeholder="values.totalInterest"
+                        v-bind="componentField"
+                        disabled
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="lotPrice">
+                <FormItem>
+                  <FormLabel>Lot Price</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        step=".01"
+                        :placeholder="values.lotPrice"
+                        v-bind="componentField"
+                        disabled
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="actualPrice">
+                <FormItem>
+                  <FormLabel>Actual Price</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        step=".01"
+                        :placeholder="values.actualPrice"
+                        v-bind="componentField"
+                        disabled
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+            </template>
+            <template
+              v-else-if="
+                values.paymentPlan ===
+                'Downpayment and Installment (without interest)'
+              "
+            >
+              <FormField v-slot="{ componentField }" name="downpayment">
+                <FormItem>
+                  <FormLabel>Downpayment *</FormLabel>
+                  <Select
+                    v-bind="componentField"
+                    @update:model-value="
+                      () => {
+                        computeForDownpayment(values, setFieldValue);
+                        if (values.terms)
+                          computeForMonthly(values, setFieldValue);
+                      }
+                    "
+                  >
+                    <FormControl>
+                      <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select a percentage" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem
+                          v-for="down in downpaymentWithoutInterest"
+                          :key="down"
+                          :value="down.toString()"
+                        >
+                          {{ `${down * 100}%` }}
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="discount">
+                <FormItem>
+                  <FormLabel>Discount</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        step=".01"
+                        placeholder="0.00"
+                        default-value="0"
+                        v-bind="componentField"
+                        @update:model-value="
+                          () => {
+                            computeForMonthly(values, setFieldValue);
+                            computeForDownpayment(values, setFieldValue);
+                          }
+                        "
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="terms">
+                <FormItem>
+                  <FormLabel>Months to Pay</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step=".01"
+                      placeholder="0.00"
+                      default-value="0"
+                      v-bind="componentField"
+                      disabled
+                    />
+                  </FormControl>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="lotPrice">
+                <FormItem>
+                  <FormLabel>Lot Price</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        step=".01"
+                        :placeholder="values.lotPrice"
+                        v-bind="componentField"
+                        disabled
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="actualPrice">
+                <FormItem>
+                  <FormLabel>Actual Price</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        step=".01"
+                        :placeholder="values.actualPrice"
+                        v-bind="componentField"
+                        disabled
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+            </template>
+            <template
+              v-else-if="
+                values.paymentPlan === 'Installment only (with interest)'
+              "
+            >
+              <FormField v-slot="{ componentField }" name="terms">
+                <FormItem>
+                  <FormLabel>Terms *</FormLabel>
+                  <Select
+                    v-bind="componentField"
+                    @update:model-value="
+                      () => computeForMonthly(values, setFieldValue)
+                    "
+                  >
+                    <FormControl>
+                      <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select a term" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem
+                          v-for="term in terms"
+                          :key="term"
+                          :value="term.toString()"
+                        >
+                          {{ term }} Months
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="discount">
+                <FormItem>
+                  <FormLabel>Discount</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        step=".01"
+                        placeholder="0.00"
+                        default-value="0"
+                        v-bind="componentField"
+                        @update:model-value="
+                          () => {
+                            computeForMonthly(values, setFieldValue);
                           }
                         "
                       />
@@ -628,8 +886,8 @@ const {
 });
 
 const {
-  data: newClientLotRecordData,
-  execute: createClientLotRecord,
+  data: clientLot,
+  execute: createClientLot,
   isLoading: isCreateClientLotRecordLoading,
 } = useAxios("", useGuardedAxiosInstance(), {
   immediate: false,
@@ -688,16 +946,16 @@ const paymentTypes = ref<string[]>([
 
 const paymentPlans = ref<string[]>([
   "Downpayment and Installment (with interest)",
-  // "Downpayment and Installment (without interest)",
-  // "Installment only (with interest)",
+  "Downpayment and Installment (without interest)",
+  "Installment only (with interest)",
 ]);
 
 const terms = ref<number[]>([12, 24, 36, 48, 60]);
 
 const downpaymentWithInterest = ref<number[]>([0, 0.1, 0.2, 0.3, 0.4, 0.5]);
-// const downpaymentWithoutInterest = ref<number[]>([
-//   0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
-// ]);
+const downpaymentWithoutInterest = ref<number[]>([
+  0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
+]);
 
 const modeOfPayment = ref<string[]>([
   "Bank Transfer",
@@ -763,13 +1021,13 @@ const downpaymentAndInstallmentWithoutInterestSchema = z.object({
   downpayment: z
     .enum(["0.3", "0.4", "0.5", "0.6", "0.7", "0.8"])
     .pipe(z.coerce.number()),
-  downpaymentPrice: z.number().multipleOf(0.01).optional().default(0),
+  downpaymentPrice: z.number().multipleOf(0.01).optional(),
   terms: z.enum(["4", "6", "8", "10", "12", "3"]).pipe(z.coerce.number()),
 });
 
 const installmentOnlySchema = z.object({
   paymentPlan: z.literal("Installment only (with interest)"),
-  downpaymentPrice: z.number().multipleOf(0.01).optional().default(0),
+  downpaymentPrice: z.number().multipleOf(0.01).optional(),
   terms: z.enum(["12", "24", "36", "48", "60"]).pipe(z.coerce.number()),
 });
 
@@ -898,6 +1156,7 @@ async function handleUploadReceipt(receipt: File) {
   }
 }
 
+// @ts-ignore
 async function handleCreateClientLot(values: any) {
   try {
     await handleUploadReceipt(values.receipt);
@@ -912,6 +1171,7 @@ async function handleCreateClientLot(values: any) {
       ...values,
       clientId,
       monthsToPay: values.terms,
+      downpayment: values.downpayment || "0",
       balance:
         Math.round(
           (values.actualPrice - values.downpaymentPrice + Number.EPSILON) * 100,
@@ -921,7 +1181,7 @@ async function handleCreateClientLot(values: any) {
     };
 
     if (values.paymentType === "Monthly Terms") {
-      await createClientLotRecord("/client-lots/diwi", {
+      await createClientLot("/client-lots", {
         method: "POST",
         data: body,
       });
@@ -930,13 +1190,16 @@ async function handleCreateClientLot(values: any) {
         paymentDue: values.monthly,
         dateOfPayment: values.dateOfPayment,
         installmentMonths: values.terms,
-        withInterest:
-          values.paymentPlan !==
-          "Downpayment and Installment (without interest)",
+        withDiscountedLastTerm:
+          values.paymentPlan ===
+            "Downpayment and Installment (without interest)" &&
+          values.terms === 3,
+        installmentOnly:
+          values.paymentPlan === "Installment only (with interest)",
       };
 
       await createPaymentPlanRecords(
-        `/client-lots/${newClientLotRecordData.value.clientLot.id}/payment-plan`,
+        `/client-lots/${clientLot.value.clientLot.id}/payment-plan`,
         {
           method: "POST",
           data: body,
@@ -944,21 +1207,40 @@ async function handleCreateClientLot(values: any) {
       );
     }
 
+    let purpose = "";
+    let payment = 0;
+
+    if (values.paymentType === "Reservation") {
+      purpose = "Reservation";
+      payment = values.reservation;
+    } else if (values.paymentType === "Monthly Terms") {
+      if (values.paymentPlan === "Installment only (with interest)") {
+        purpose = "Payment Plan";
+        payment = values.monthly;
+      } else {
+        purpose = "Downpayment";
+        payment = values.downpaymentPrice;
+      }
+    } else {
+      purpose = "Full Payment";
+      payment = values.actualPrice;
+    }
+
     body = {
       ...values,
-      payment: values.downpaymentPrice,
-      clientLotId: newClientLotRecordData.value.clientLot.id,
-      purpose: "Downpayment",
+      payment,
+      purpose,
+      clientLotId: clientLot.value.clientLot.id,
       receipt: newReceipt.value.public_id,
       createdBy,
       createdOn,
     };
     await createInvoice(
-      `/client-lots/${newClientLotRecordData.value.clientLot.id}/invoices`,
+      `/client-lots/${clientLot.value.clientLot.id}/invoices`,
       { method: "POST", data: body },
     );
 
-    toast.success(newClientLotRecordData.value.message);
+    toast.success(clientLot.value.message);
     dialogState.value = false;
     emit("refresh");
   } catch (error: unknown) {
