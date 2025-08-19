@@ -604,6 +604,105 @@
                   </FormControl>
                 </FormItem>
               </FormField>
+            </template>
+          </template>
+          <template v-else-if="values.paymentType === 'Full Payment'">
+            <FormField v-slot="{ componentField }" name="inNeed">
+              <FormItem class="col-span-2">
+                <FormLabel>In need? *</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    class="flex flex-col space-y-1"
+                    v-bind="componentField"
+                    @update:model-value="
+                      (v) => {
+                        if (v === 'No') {
+                          setFieldValue('inNeedPrice', undefined);
+                          let actualPrice = values.lotPrice;
+                          actualPrice -= values.discount | 0;
+                          setFieldValue('actualPrice', actualPrice);
+                        }
+                        const lot = lots.find(
+                          (lot: any) => lot.id === parseInt(values.lotId),
+                        );
+                        if (lot) {
+                          setFieldValue('lotPrice', lot.price);
+                          setFieldValue('actualPrice', lot.price);
+                        }
+                      }
+                    "
+                  >
+                    <FormItem class="flex items-center space-y-0 gap-x-3">
+                      <FormControl>
+                        <RadioGroupItem value="Yes" />
+                      </FormControl>
+                      <FormLabel class="font-normal"> Yes </FormLabel>
+                    </FormItem>
+                    <FormItem class="flex items-center space-y-0 gap-x-3">
+                      <FormControl>
+                        <RadioGroupItem value="No" />
+                      </FormControl>
+                      <FormLabel class="font-normal"> No </FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+              </FormItem>
+            </FormField>
+            <template v-if="values.inNeed === 'Yes'">
+              <FormField v-slot="{ componentField }" name="inNeedPrice">
+                <FormItem>
+                  <FormLabel>In need price *</FormLabel>
+                  <Select
+                    v-bind="componentField"
+                    @update:model-value="
+                      (v: any) => {
+                        let actualPrice = values.lotPrice;
+                        actualPrice = actualPrice + actualPrice * parseFloat(v);
+                        actualPrice -= parseInt(values.discount || 0);
+                        setFieldValue('actualPrice', actualPrice);
+                      }
+                    "
+                  >
+                    <FormControl>
+                      <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select a percentage" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="0.1"> 10% </SelectItem>
+                        <SelectItem value="0.2"> 20% </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </template>
+            <template v-if="values.inNeed">
+              <FormField v-slot="{ componentField }" name="discount">
+                <FormItem :class="{ 'col-span-2': values.inNeed === 'No' }">
+                  <FormLabel>Discount</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        step=".01"
+                        placeholder="0.00"
+                        default-value="0"
+                        v-bind="componentField"
+                        @update:model-value="
+                          () => {
+                            computeForMonthly(values, setFieldValue);
+                          }
+                        "
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
               <FormField v-slot="{ componentField }" name="lotPrice">
                 <FormItem>
                   <FormLabel>Lot Price</FormLabel>
@@ -641,9 +740,6 @@
                 </FormItem>
               </FormField>
             </template>
-          </template>
-          <template v-else-if="values.paymentType === 'Full Payment'">
-            Full Payment
           </template>
           <template
             v-if="
@@ -949,7 +1045,7 @@ const withoutInterestTerms = {
 const paymentTypes = ref<string[]>([
   // "Reservation",
   "Monthly Terms",
-  // "Full Payment",
+  "Full Payment",
 ]);
 
 const paymentPlans = ref<string[]>([
@@ -1184,25 +1280,40 @@ async function handleCreateClientLot(values: any) {
       });
     }
 
-    body = {
-      ...values,
-      clientId,
-      monthsToPay: values.terms,
-      downpayment: values.downpayment || "0",
-      balance:
-        Math.round(
-          (values.actualPrice - values.downpaymentPrice + Number.EPSILON) * 100,
-        ) / 100,
-      createdBy,
-      createdOn,
-    };
+    if (values.paymentType === "Monthly Terms") {
+      body = {
+        ...values,
+        clientId,
+        monthsToPay: values.terms,
+        downpayment: values.downpayment || "0",
+        balance:
+          Math.round(
+            (values.actualPrice - values.downpaymentPrice + Number.EPSILON) *
+              100,
+          ) / 100,
+        createdBy,
+        createdOn,
+      };
+    } else if (values.paymentType === "Full Payment") {
+      body = {
+        ...values,
+        clientId,
+        terms: 0,
+        paymentPlan: "",
+        monthsToPay: 0,
+        downpayment: "0",
+        balance: 0,
+        createdBy,
+        createdOn,
+      };
+    }
+
+    await createClientLot("/client-lots", {
+      method: "POST",
+      data: body,
+    });
 
     if (values.paymentType === "Monthly Terms") {
-      await createClientLot("/client-lots", {
-        method: "POST",
-        data: body,
-      });
-
       body = {
         paymentDue: values.monthly,
         dateOfPayment: values.dateOfPayment,
