@@ -144,7 +144,7 @@
                   v-bind="componentField"
                   :orientation="'vertical'"
                   @update:model-value="
-                    () => {
+                    (v: string) => {
                       const lot = lots.find(
                         (lot: any) => lot.id === Number(values.lotId),
                       );
@@ -152,11 +152,14 @@
                         setFieldValue('lotPrice', lot.price);
                         setFieldValue('actualPrice', lot.price);
                       }
+                      setFieldValue('reservation', 0);
                       setFieldValue('downpaymentPrice', 0);
                       setFieldValue('monthly', 0);
                       setFieldValue('totalInterest', 0);
                       setFieldValue('downpayment', undefined, false);
                       setFieldValue('terms', undefined, false);
+                      if (v === 'Reservation')
+                        setFieldValue('reservation', 500);
                     }
                   "
                 >
@@ -173,7 +176,42 @@
             </FormItem>
           </FormField>
           <template v-if="values.paymentType === 'Reservation'">
-            Reservation
+            <FormField v-slot="{ componentField }" name="reservation">
+              <FormItem>
+                <FormLabel>Reservation Fee</FormLabel>
+                <FormControl>
+                  <div class="relative flex items-center">
+                    <Input
+                      class="pl-6"
+                      type="number"
+                      step=".01"
+                      default-value="0"
+                      v-bind="componentField"
+                      disabled
+                    />
+                    <span class="absolute pl-3"> ₱ </span>
+                  </div>
+                </FormControl>
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="lotPrice">
+              <FormItem>
+                <FormLabel>Lot Price</FormLabel>
+                <FormControl>
+                  <div class="relative flex items-center">
+                    <Input
+                      class="pl-6"
+                      type="number"
+                      step=".01"
+                      :placeholder="values.lotPrice"
+                      v-bind="componentField"
+                      disabled
+                    />
+                    <span class="absolute pl-3"> ₱ </span>
+                  </div>
+                </FormControl>
+              </FormItem>
+            </FormField>
           </template>
           <template v-else-if="values.paymentType === 'Monthly Terms'">
             <FormField v-slot="{ componentField }" name="paymentPlan">
@@ -1016,13 +1054,13 @@ const {
     immediate: false,
   },
 );
-const {
-  // data: newInvoice,
-  execute: createInvoice,
-  isLoading: isCreateInvoiceLoading,
-} = useAxios("", useGuardedAxiosInstance(), {
-  immediate: false,
-});
+const { execute: createInvoice, isLoading: isCreateInvoiceLoading } = useAxios(
+  "",
+  useGuardedAxiosInstance(),
+  {
+    immediate: false,
+  },
+);
 
 const dialogState = ref<boolean>(false);
 
@@ -1043,7 +1081,7 @@ const withoutInterestTerms = {
 };
 
 const paymentTypes = ref<string[]>([
-  // "Reservation",
+  "Reservation",
   "Monthly Terms",
   "Full Payment",
 ]);
@@ -1294,7 +1332,7 @@ async function handleCreateClientLot(values: any) {
         createdBy,
         createdOn,
       };
-    } else if (values.paymentType === "Full Payment") {
+    } else {
       body = {
         ...values,
         clientId,
