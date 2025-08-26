@@ -40,7 +40,20 @@
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem
-                      v-for="purpose in purposes"
+                      v-for="purpose in purposes.filter((purpose) => {
+                        if (
+                          paymentType === 'Monthly Terms' &&
+                          ['Full Payment', 'Reservation'].includes(purpose)
+                        ) {
+                          return false;
+                        } else if (
+                          paymentType === 'Full Payment' &&
+                          ['Payment Plan', 'Reservation'].includes(purpose)
+                        ) {
+                          return false;
+                        }
+                        return true;
+                      })"
                       :key="purpose"
                       :value="purpose"
                     >
@@ -254,6 +267,7 @@ import { useEnv } from "@/lib/env";
 import { Input } from "@/components/ui/input";
 
 const clientLotId = inject("clientLotId");
+const paymentType = inject("paymentType");
 
 const emit = defineEmits(["refresh"]);
 
@@ -282,8 +296,6 @@ const {
 const dialogState = ref<boolean>(false);
 
 const purposes = ref<string[]>([
-  "Full Payment",
-  "Downpayment",
   "Payment Plan",
   "Interment",
   "Perpetual Care",

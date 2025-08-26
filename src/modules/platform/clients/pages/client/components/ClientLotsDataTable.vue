@@ -35,6 +35,7 @@ import EditClientLotSheet from "./EditClientLotSheet.vue";
 
 type ClientLotColumns = {
   id: number;
+  paymentType: string;
   property: {
     id: number;
     name: string;
@@ -219,11 +220,15 @@ const columns: ColumnDef<ClientLotColumns>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const { id: clientLotId } = row.original;
+      const { id: clientLotId, paymentType } = row.original;
       const actions = [];
 
       actions.push(
-        h(EditClientLotSheet, { clientLotId, onRefresh: () => execute() }),
+        h(EditClientLotSheet, {
+          clientLotId,
+          paymentType,
+          onRefresh: () => execute(),
+        }),
       );
 
       return h("div", { class: "flex gap-2 justify-end" }, actions);

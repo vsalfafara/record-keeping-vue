@@ -20,9 +20,11 @@ import { provide } from "vue";
 
 type EditClientLotSheetProps = {
   clientLotId: number;
+  paymentType: string;
 };
 
-const { clientLotId } = defineProps<EditClientLotSheetProps>();
+const { clientLotId, paymentType } = defineProps<EditClientLotSheetProps>();
 
 provide("clientLotId", clientLotId);
+provide("paymentType", paymentType);
 </script>
