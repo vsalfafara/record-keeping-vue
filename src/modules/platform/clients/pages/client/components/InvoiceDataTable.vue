@@ -72,6 +72,22 @@ const columns: ColumnDef<InvoiceColumns>[] = [
     cell: ({ row }) => `₱${row.getValue("payment")}`,
   },
   {
+    accessorKey: "modeOfPayment",
+    enableSorting: true,
+    meta: "Mode of Payment",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Mode of Payment", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })],
+      );
+    },
+    cell: ({ row }) => row.getValue("modeOfPayment"),
+  },
+  {
     accessorKey: "dateOfPayment",
     enableSorting: true,
     meta: "Date of Payment",
