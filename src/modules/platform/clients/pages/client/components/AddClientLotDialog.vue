@@ -353,7 +353,6 @@
                         v-bind="componentField"
                         @update:model-value="
                           () => {
-                            computeForMonthly(values, setFieldValue);
                             computeForDownpayment(values, setFieldValue);
                           }
                         "
@@ -488,7 +487,6 @@
                         v-bind="componentField"
                         @update:model-value="
                           () => {
-                            computeForMonthly(values, setFieldValue);
                             computeForDownpayment(values, setFieldValue);
                           }
                         "
@@ -654,6 +652,7 @@
                     v-bind="componentField"
                     @update:model-value="
                       (v) => {
+                        setFieldValue('discount', 0);
                         if (v === 'No') {
                           setFieldValue('inNeedPrice', undefined);
                           let actualPrice = values.lotPrice;
@@ -694,8 +693,8 @@
                     v-bind="componentField"
                     @update:model-value="
                       (v: any) => {
-                        let actualPrice = values.lotPrice;
-                        actualPrice = actualPrice + actualPrice * parseFloat(v);
+                        let lotPrice = values.lotPrice;
+                        let actualPrice = lotPrice + lotPrice * parseFloat(v);
                         actualPrice -= parseInt(values.discount || 0);
                         setFieldValue('actualPrice', actualPrice);
                       }
@@ -732,7 +731,7 @@
                         v-bind="componentField"
                         @update:model-value="
                           () => {
-                            computeForMonthly(values, setFieldValue);
+                            computeForActualPrice(values, setFieldValue);
                           }
                         "
                       />
@@ -1270,10 +1269,12 @@ function computeForTotalInterest(values: any, setFieldValue: any) {
 }
 
 function computeForActualPrice(values: any, setFieldValue: any) {
+  const lotPrice = values.lotPrice;
+  const inNeedPrice = Number(values.inNeedPrice || 0);
   const discount = values.discount || 0;
   const totalInterest = values.totalInterest || 0;
   const actualPrice = Number(
-    (values.lotPrice - discount + totalInterest).toFixed(2),
+    (lotPrice + lotPrice * inNeedPrice + totalInterest - discount).toFixed(2),
   );
   setFieldValue("actualPrice", actualPrice);
 }
