@@ -203,50 +203,43 @@ const columnVisibility = ref<VisibilityState>(visibleColumns);
 const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
-let table = initializeTable();
-
-function initializeTable() {
-  return useVueTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: enablePagination
-      ? getPaginationRowModel()
-      : undefined,
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
-    onColumnFiltersChange: (updaterOrValue) =>
-      valueUpdater(updaterOrValue, columnFilters),
-    onColumnVisibilityChange: (updaterOrValue) =>
-      valueUpdater(updaterOrValue, columnVisibility),
-    onRowSelectionChange: (updaterOrValue) =>
-      valueUpdater(updaterOrValue, rowSelection),
-    onExpandedChange: (updaterOrValue) =>
-      valueUpdater(updaterOrValue, expanded),
-    state: {
-      get sorting() {
-        return sorting.value;
-      },
-      get columnFilters() {
-        return columnFilters.value;
-      },
-      get columnVisibility() {
-        return columnVisibility.value;
-      },
-      get rowSelection() {
-        return rowSelection.value;
-      },
-      get expanded() {
-        return expanded.value;
-      },
-      columnPinning: {
-        right: ["actions"],
-      },
+const table = useVueTable({
+  data,
+  columns,
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  getExpandedRowModel: getExpandedRowModel(),
+  onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
+  onColumnFiltersChange: (updaterOrValue) =>
+    valueUpdater(updaterOrValue, columnFilters),
+  onColumnVisibilityChange: (updaterOrValue) =>
+    valueUpdater(updaterOrValue, columnVisibility),
+  onRowSelectionChange: (updaterOrValue) =>
+    valueUpdater(updaterOrValue, rowSelection),
+  onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
+  state: {
+    get sorting() {
+      return sorting.value;
     },
-  });
-}
+    get columnFilters() {
+      return columnFilters.value;
+    },
+    get columnVisibility() {
+      return columnVisibility.value;
+    },
+    get rowSelection() {
+      return rowSelection.value;
+    },
+    get expanded() {
+      return expanded.value;
+    },
+    columnPinning: {
+      right: ["actions"],
+    },
+  },
+});
 
 function handleFilter() {
   if (columnToFilter.value) {
@@ -254,11 +247,6 @@ function handleFilter() {
     else table.getColumn(columnToFilter.value)?.setFilterValue(search.value);
   }
 }
-
-watch(
-  () => data,
-  () => (table = initializeTable()),
-);
 
 watch(search, () => handleFilter());
 

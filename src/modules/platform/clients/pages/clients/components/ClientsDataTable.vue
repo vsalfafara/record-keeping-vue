@@ -6,6 +6,7 @@
     :data
     :is-loading
     :visibleColumns
+    :key="data"
   >
     <template #actions>
       <AddClientDialog @refresh="execute" />

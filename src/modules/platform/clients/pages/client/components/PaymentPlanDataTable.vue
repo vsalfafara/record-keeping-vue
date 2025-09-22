@@ -6,6 +6,7 @@
     :columns
     :is-loading
     :visibleColumns
+    :key="data"
   />
 </template>
 <script setup lang="ts">

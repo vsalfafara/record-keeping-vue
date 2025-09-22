@@ -9,12 +9,17 @@
       @update:open="
         (state: boolean) => {
           dialogState = state;
-          if (state) resetForm();
+          if (state) {
+            resetForm();
+            setFieldValue('paymentType', 'Monthly Terms');
+            setFieldValue('lotPrice', lot.price);
+            setFieldValue('actualPrice', lot.price);
+          }
         }
       "
     >
       <DialogTrigger as-child>
-        <Button variant="info"> <Plus /> Add Lot </Button>
+        <Button variant="info"> <Plus /> Add Terms </Button>
       </DialogTrigger>
       <DialogScrollContent>
         <DialogHeader>
@@ -23,143 +28,30 @@
               class="bg-info/10 text-info dark:bg-info h-8 w-8 rounded-md p-2 dark:text-white"
           /></DialogTitle>
           <DialogDescription>
-            <h3 class="text-primary mb-2 text-lg font-semibold">Add Lot</h3>
+            <h3 class="text-primary mb-2 text-lg font-semibold">Add Terms</h3>
             <p>Fill out the form</p>
           </DialogDescription>
         </DialogHeader>
         <form
           id="add-client-lot-form"
           class="grid grid-cols-2 gap-4"
-          @submit="handleSubmit($event, handleCreateClientLot)"
+          @submit="handleSubmit($event, handleUpdateClientLot)"
         >
-          <FormField v-slot="{ componentField }" name="propertyId">
-            <FormItem class="col-span-2">
-              <FormLabel>Property Name *</FormLabel>
-              <Select
-                v-bind="componentField"
-                @update:model-value="
-                  async (v) => {
-                    blocks = null;
-                    lots = null;
-                    setFieldValue('blockId', null, false);
-                    setFieldValue('lotId', null, false);
-                    await getBlocks(`/properties/${v}/blocks/list`);
-                    if (!blocks.length) {
-                      toast.error('No available blocks');
-                    }
-                  }
-                "
-              >
-                <FormControl>
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select a property" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="property in properties"
-                      :key="property.id"
-                      :value="property.id"
-                    >
-                      {{ property.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="blockId">
-            <FormItem>
-              <FormLabel>Block *</FormLabel>
-              <Skeleton v-if="isBlocksLoading" class="h-9 w-full" />
-              <Select
-                v-else
-                v-bind="componentField"
-                :disabled="!blocks?.length"
-                @update:model-value="
-                  async (v) => {
-                    lots = null;
-                    setFieldValue('lotId', null, false);
-                    await getLots(`/blocks/${v}/lots/not-taken`);
-                    if (!lots.length) {
-                      toast.error('No available lots');
-                    }
-                  }
-                "
-              >
-                <FormControl>
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select a block" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="block in blocks"
-                      :key="block.id"
-                      :value="block.id"
-                    >
-                      {{ block.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="lotId">
-            <FormItem>
-              <FormLabel>Lot No. *</FormLabel>
-              <Skeleton v-if="isLotsLoading" class="h-9 w-full" />
-              <Select v-else v-bind="componentField" :disabled="!lots?.length">
-                <FormControl>
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select a lot" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="lot in lots"
-                      :key="lot.id"
-                      :value="lot.id"
-                    >
-                      {{ lot.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <FormField
-            v-if="values.lotId"
-            v-slot="{ componentField }"
-            name="paymentType"
-          >
+          <FormField v-slot="{ componentField }" name="paymentType">
             <FormItem class="col-span-2">
               <FormLabel>Select Payment Type *</FormLabel>
               <FormControl>
                 <RadioGroup
                   v-bind="componentField"
+                  default-value="Monthly Terms"
                   :orientation="'vertical'"
                   @update:model-value="
-                    (v: string) => {
-                      const lot = lots.find(
-                        (lot: any) => lot.id === Number(values.lotId),
-                      );
-                      if (lot) {
-                        setFieldValue('lotPrice', lot.price);
-                        setFieldValue('actualPrice', lot.price);
-                      }
-                      setFieldValue('reservation', 0);
+                    () => {
                       setFieldValue('downpaymentPrice', 0);
                       setFieldValue('monthly', 0);
                       setFieldValue('totalInterest', 0);
                       setFieldValue('downpayment', undefined, false);
                       setFieldValue('terms', undefined, false);
-                      if (v === 'Reservation')
-                        setFieldValue('reservation', 500);
                     }
                   "
                 >
@@ -173,64 +65,19 @@
                   </div>
                 </RadioGroup>
               </FormControl>
+              <FormMessage />
             </FormItem>
           </FormField>
-          <template v-if="values.paymentType === 'Reservation'">
-            <FormField v-slot="{ componentField }" name="reservation">
-              <FormItem>
-                <FormLabel>Reservation Fee</FormLabel>
-                <FormControl>
-                  <div class="relative flex items-center">
-                    <Input
-                      class="pl-6"
-                      type="number"
-                      step=".01"
-                      default-value="0"
-                      v-bind="componentField"
-                      disabled
-                    />
-                    <span class="absolute pl-3"> ₱ </span>
-                  </div>
-                </FormControl>
-              </FormItem>
-            </FormField>
-            <FormField v-slot="{ componentField }" name="lotPrice">
-              <FormItem>
-                <FormLabel>Lot Price</FormLabel>
-                <FormControl>
-                  <div class="relative flex items-center">
-                    <Input
-                      class="pl-6"
-                      type="number"
-                      step=".01"
-                      :placeholder="values.lotPrice"
-                      v-bind="componentField"
-                      disabled
-                    />
-                    <span class="absolute pl-3"> ₱ </span>
-                  </div>
-                </FormControl>
-              </FormItem>
-            </FormField>
-          </template>
-          <template v-else-if="values.paymentType === 'Monthly Terms'">
+          <template v-if="values.paymentType === 'Monthly Terms'">
             <FormField v-slot="{ componentField }" name="paymentPlan">
               <FormItem class="col-span-2">
                 <FormLabel>Select Payment Plan* </FormLabel>
                 <FormControl>
                   <RadioGroup
                     v-bind="componentField"
-                    default-value="Reservation"
                     :orientation="'vertical'"
                     @update:model-value="
                       () => {
-                        const lot = lots.find(
-                          (lot: any) => lot.id === parseInt(values.lotId),
-                        );
-                        if (lot) {
-                          setFieldValue('lotPrice', lot.price);
-                          setFieldValue('actualPrice', lot.price);
-                        }
                         setFieldValue('downpaymentPrice', 0);
                         setFieldValue('monthly', 0);
                         setFieldValue('totalInterest', 0);
@@ -923,9 +770,6 @@
             <template v-if="isUploadReceiptLoading"
               >Uploading receipt...</template
             >
-            <template v-else-if="isUpdateLotToTakenLoading">
-              Updating lot...
-            </template>
             <template v-else-if="isCreateClientLotRecordLoading"
               >Creating client lot record...</template
             >
@@ -974,13 +818,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useGuardedAxiosInstance } from "@/lib/axios";
 import { toTypedSchema } from "@vee-validate/zod";
 import { now, useDateFormat, useFileDialog } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { Plus, CalendarIcon, CloudUpload, Loader2 } from "lucide-vue-next";
-import { ref } from "vue";
+import { inject, ref, type EmitFn } from "vue";
 import { toast } from "vue-sonner";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
@@ -988,47 +831,32 @@ import { useAuthenticationStore } from "@/authentication/authentication.store";
 import { useEnv } from "@/lib/env";
 import { AxiosError } from "axios";
 
-type AddClientLotDialogProps = {
-  clientId: number;
+type Lot = {
+  id: number;
+  name: string;
+  price: number;
 };
 
-const { clientId } = defineProps<AddClientLotDialogProps>();
+const clientId: number = inject("clientId") as number;
+const clientLotId: number = inject("clientLotId") as number;
+const propertyId: number = inject("propertyId") as number;
+const blockId: number = inject("blockId") as number;
+const lot: Lot = inject("lot") as Lot;
 
-const emit = defineEmits(["refresh"]);
+const emits = inject("refresh") as EmitFn;
 
 const { open, onChange } = useFileDialog({
   accept: "image/*",
 });
 
-const { data: properties } = useAxios(
-  "/properties/list",
+const { data: lots } = useAxios(
+  `/blocks/${blockId}/lots/not-taken`,
   useGuardedAxiosInstance(),
 );
 
 const {
-  data: blocks,
-  execute: getBlocks,
-  isLoading: isBlocksLoading,
-} = useAxios("", useGuardedAxiosInstance(), {
-  immediate: false,
-});
-
-const {
-  data: lots,
-  execute: getLots,
-  isLoading: isLotsLoading,
-} = useAxios("", useGuardedAxiosInstance(), {
-  immediate: false,
-});
-
-const { execute: updateLotToTaken, isLoading: isUpdateLotToTakenLoading } =
-  useAxios("", useGuardedAxiosInstance(), {
-    immediate: false,
-  });
-
-const {
   data: clientLot,
-  execute: createClientLot,
+  execute: updateClientLot,
   isLoading: isCreateClientLotRecordLoading,
 } = useAxios("", useGuardedAxiosInstance(), {
   immediate: false,
@@ -1079,11 +907,7 @@ const withoutInterestTerms = {
   0.8: "3",
 };
 
-const paymentTypes = ref<string[]>([
-  "Reservation",
-  "Monthly Terms",
-  "Full Payment",
-]);
+const paymentTypes = ref<string[]>(["Monthly Terms", "Full Payment"]);
 
 const paymentPlans = ref<string[]>([
   "Downpayment and Installment (with interest)",
@@ -1105,10 +929,7 @@ const modeOfPayment = ref<string[]>([
 ]);
 
 const baseSchema = z.object({
-  propertyId: z.number(),
-  blockId: z.number(),
-  lotId: z.number(),
-  paymentType: z.enum(["Reservation", "Monthly Terms", "Full Payment"]),
+  paymentType: z.enum(["Monthly Terms", "Full Payment"]),
   lotPrice: z.number().multipleOf(0.01),
   modeOfPayment: z.enum(["Bank Transfer", "Cash Payment", "Check Payment"]),
   dateOfPayment: z.string(),
@@ -1121,19 +942,6 @@ const baseSchema = z.object({
   downpaymentPrice: z.number().multipleOf(0.01).optional().default(0),
   totalInterest: z.number().multipleOf(0.01).optional().default(0),
   monthly: z.number().multipleOf(0.01).optional().default(0),
-});
-
-const reservationSchema = z.object({
-  paymentType: z.literal("Reservation"),
-  reservation: z.number(),
-  discount: z
-    .number({ message: "Please enter an amount" })
-    .min(0)
-    .multipleOf(0.01)
-    .optional()
-    .or(z.literal(0))
-    .optional(),
-  actualPrice: z.number().multipleOf(0.01).optional(),
 });
 
 const monthlyTermsSchema = z.object({
@@ -1200,11 +1008,7 @@ const inNeedFormSchema = z
   .and(baseSchema);
 
 const paymentTypeFormSchema = z
-  .discriminatedUnion("paymentType", [
-    reservationSchema,
-    monthlyTermsSchema,
-    fullPaymentSchema,
-  ])
+  .discriminatedUnion("paymentType", [monthlyTermsSchema, fullPaymentSchema])
   .and(baseSchema);
 
 const formSchema = toTypedSchema(
@@ -1299,30 +1103,24 @@ async function handleUploadReceipt(receipt: File) {
   }
 }
 
-async function handleCreateClientLot(values: any) {
+async function handleUpdateClientLot(values: any) {
   try {
     await handleUploadReceipt(values.receipt);
 
     const { user } = useAuthenticationStore();
-    const { env } = useEnv();
-    const createdBy = `${user?.data?.firstName} ${user?.data?.lastName}`;
+    const createdBy = `${user?.data.firstName} ${user?.data.lastName}`;
     const createdOn = useDateFormat(now(), "YYYY-MM-DD").value;
 
     let body = {};
-
-    if (env.VITE_ENV !== "development") {
-      await updateLotToTaken(`/lots/${values.lotId}`, {
-        method: "put",
-        data: {
-          taken: true,
-        },
-      });
-    }
-
     if (values.paymentType === "Monthly Terms") {
       body = {
         ...values,
         clientId,
+        clientLotId,
+        propertyId,
+        blockId,
+        lotId: lot.id,
+        terms: values.terms,
         monthsToPay: values.terms,
         downpayment: values.downpayment || "0",
         balance:
@@ -1337,6 +1135,10 @@ async function handleCreateClientLot(values: any) {
       body = {
         ...values,
         clientId,
+        clientLotId,
+        propertyId,
+        blockId,
+        lotId: lot.id,
         terms: 0,
         paymentPlan: "",
         monthsToPay: 0,
@@ -1347,8 +1149,8 @@ async function handleCreateClientLot(values: any) {
       };
     }
 
-    await createClientLot("/client-lots", {
-      method: "POST",
+    await updateClientLot(`/client-lots/${clientLotId}`, {
+      method: "PUT",
       data: body,
     });
 
@@ -1366,7 +1168,7 @@ async function handleCreateClientLot(values: any) {
       };
 
       await createPaymentPlanRecords(
-        `/client-lots/${clientLot.value.clientLot.id}/payment-plan`,
+        `/client-lots/${clientLotId}/payment-plan`,
         {
           method: "POST",
           data: body,
@@ -1377,10 +1179,7 @@ async function handleCreateClientLot(values: any) {
     let purpose = "";
     let payment = 0;
 
-    if (values.paymentType === "Reservation") {
-      purpose = "Reservation";
-      payment = values.reservation;
-    } else if (values.paymentType === "Monthly Terms") {
+    if (values.paymentType === "Monthly Terms") {
       if (values.paymentPlan === "Installment only (with interest)") {
         purpose = "Payment Plan";
         payment = values.monthly;
@@ -1393,23 +1192,24 @@ async function handleCreateClientLot(values: any) {
       payment = values.actualPrice;
     }
 
-    body = {
+    const invoice = {
       ...values,
       payment,
       purpose,
-      clientLotId: clientLot.value.clientLot.id,
+      clientLotId,
       receipt: newReceipt.value.public_id,
       createdBy,
       createdOn,
     };
-    await createInvoice(
-      `/client-lots/${clientLot.value.clientLot.id}/invoices`,
-      { method: "POST", data: body },
-    );
+
+    await createInvoice(`/client-lots/${clientLotId}/invoices`, {
+      method: "POST",
+      data: invoice,
+    });
 
     toast.success(clientLot.value.message);
     dialogState.value = false;
-    emit("refresh");
+    emits("refresh");
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       toast.error("Something went wrong with creating this record...");

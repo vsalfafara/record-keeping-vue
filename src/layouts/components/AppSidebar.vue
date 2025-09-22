@@ -61,7 +61,7 @@
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
               <SidebarMenuButton>
-                <User /> {{ user?.data.email }}
+                <User /> {{ user?.data?.email }}
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent

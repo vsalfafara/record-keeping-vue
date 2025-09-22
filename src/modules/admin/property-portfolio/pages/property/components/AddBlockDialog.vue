@@ -108,7 +108,7 @@ async function handleCreateBlock(values: any) {
     const body = {
       ...values,
       propertyId: Number(params.id),
-      createdBy: `${user?.data.firstName} ${user?.data.lastName}`,
+      createdBy: `${user?.data?.firstName} ${user?.data?.lastName}`,
       createdOn: useDateFormat(now(), "YYYY-MM-DD").value,
     };
     await execute("/blocks", { method: "POST", data: body });

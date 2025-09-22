@@ -8,6 +8,7 @@
       :isLoading
       :columns
       :visibleColumns
+      :key="data"
     >
       <template #actions>
         <AddBlockDialog @refresh="execute()" />

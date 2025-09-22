@@ -1,7 +1,7 @@
 <template>
   <div>
     <RouterView></RouterView>
-    <Toaster rich-colors />
+    <Toaster class="pointer-events-auto" rich-colors />
   </div>
 </template>
 

@@ -215,7 +215,7 @@ async function handleCreateClient(values: any) {
     const { user } = useAuthenticationStore();
     const body = {
       ...values,
-      createdBy: `${user?.data.firstName} ${user?.data.lastName}`,
+      createdBy: `${user?.data?.firstName} ${user?.data?.lastName}`,
       createdOn: useDateFormat(now(), "YYYY-MM-DD").value,
     };
     await execute({ method: "POST", data: body });

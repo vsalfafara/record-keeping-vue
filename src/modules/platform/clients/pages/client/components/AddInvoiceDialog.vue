@@ -351,7 +351,7 @@ async function handleCreateUploadReceipt(values: any) {
     await handleUploadReceipt(values.receipt);
 
     const { user } = useAuthenticationStore();
-    const createdBy = `${user?.data.firstName} ${user?.data.lastName}`;
+    const createdBy = `${user?.data?.firstName} ${user?.data?.lastName}`;
     const createdOn = useDateFormat(now(), "YYYY-MM-DD").value;
 
     const body = {

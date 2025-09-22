@@ -8,12 +8,10 @@
       :is-loading
       :columns
       :visibleColumns
+      :key="data"
     >
       <template #actions>
-        <AddClientLotDialog
-          :client-id="Number(params.id)"
-          @refresh="execute()"
-        />
+        <AddClientLotDialog :client-id="Number(params.id)" @refresh="execute" />
       </template>
     </DataTable>
   </div>
@@ -28,13 +26,14 @@ import type { ColumnDef, VisibilityState } from "@tanstack/vue-table";
 import { useStorage } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { ArrowUpDown } from "lucide-vue-next";
-import { h } from "vue";
+import { h, provide } from "vue";
 import { useRoute } from "vue-router";
 import AddClientLotDialog from "./AddClientLotDialog.vue";
 import EditClientLotSheet from "./EditClientLotSheet.vue";
 
 type ClientLotColumns = {
   id: number;
+  clientId: number;
   paymentType: string;
   property: {
     id: number;
@@ -220,11 +219,22 @@ const columns: ColumnDef<ClientLotColumns>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const { id: clientLotId, paymentType } = row.original;
+      const {
+        id: clientLotId,
+        property,
+        block,
+        lot,
+        clientId,
+        paymentType,
+      } = row.original;
       const actions = [];
 
       actions.push(
         h(EditClientLotSheet, {
+          clientId,
+          blockId: block.id,
+          propertyId: property.id,
+          lot,
           clientLotId,
           paymentType,
           onRefresh: () => execute(),

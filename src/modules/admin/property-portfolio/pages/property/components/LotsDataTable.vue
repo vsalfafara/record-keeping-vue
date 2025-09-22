@@ -6,6 +6,7 @@
     :isLoading
     :columns
     :visibleColumns
+    :key="data"
     lots-max-height
   >
     <template #actions>

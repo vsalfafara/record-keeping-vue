@@ -25,6 +25,7 @@
       :data="data?.properties"
       :is-loading
       :visibleColumns
+      :key="data?.properties"
     >
       <template #actions>
         <AddPropertyDialog @refresh="execute" />

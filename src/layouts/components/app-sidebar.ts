@@ -12,7 +12,7 @@ export function useGroupedSidebarRoutes() {
     const routes = sidebarRoutes.filter(({ meta }) => {
       if (!meta) return false;
       const groupIsEqual = meta.group === name;
-      const userHasAccess = meta.access.includes(user.value?.data.role || "");
+      const userHasAccess = meta.access.includes(user.value?.data?.role || "");
       return groupIsEqual && userHasAccess;
     });
     const group = {

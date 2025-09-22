@@ -19,12 +19,28 @@ import ClientLotDetailsTabs from "./ClientLotDetailsTabs.vue";
 import { provide } from "vue";
 
 type EditClientLotSheetProps = {
+  clientId: number;
+  propertyId: number;
+  blockId: number;
+  lot: {
+    id: number;
+    name: string;
+    price: number;
+  };
   clientLotId: number;
   paymentType: string;
 };
 
-const { clientLotId, paymentType } = defineProps<EditClientLotSheetProps>();
+const { clientId, propertyId, blockId, lot, clientLotId, paymentType } =
+  defineProps<EditClientLotSheetProps>();
 
+const emits = defineEmits(["refresh"]);
+
+provide("refresh", emits);
+provide("clientId", clientId);
+provide("propertyId", propertyId);
+provide("blockId", blockId);
+provide("lot", lot);
 provide("clientLotId", clientLotId);
 provide("paymentType", paymentType);
 </script>

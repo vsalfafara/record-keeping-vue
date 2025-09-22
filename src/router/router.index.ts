@@ -42,11 +42,10 @@ router.beforeEach((to, from, next) => {
 
   if (!isAuthenticated && to.name !== "Login") next({ name: "Login" });
   else if (isAuthenticated) {
-    if (to.path === "/") next({ name: "Clients" });
-    else if (to.name === "Login") next({ name: "Clients" });
+    if (to.path === "/" || to.name === "Login") next({ name: "Clients" });
     else if (
-      to.meta.access instanceof Array &&
-      !to.meta.access.includes(user.value?.data.role)
+      to.meta?.access instanceof Array &&
+      !to.meta?.access.includes(user.value?.data?.role)
     ) {
       toast.error("You do not have permission to access this page");
       next(from);

@@ -8,9 +8,13 @@
       </SheetTitle>
       <SheetDescription>
         <Skeleton v-if="isLoading" class="h-4 w-40" />
-        <p v-else class="text-lg font-semibold">
-          {{ data.property.name }} | {{ data.block.name }} | {{ data.lot.name }}
-        </p>
+        <div v-else class="flex justify-between">
+          <p class="text-lg font-semibold">
+            {{ data.property.name }} | {{ data.block.name }} |
+            {{ data.lot.name }}
+          </p>
+          <AddTermsDialog v-if="data.paymentType === 'Reservation'" />
+        </div>
       </SheetDescription>
     </SheetHeader>
     <Form>
@@ -250,10 +254,11 @@ import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { Pencil } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { inject } from "vue";
+import AddTermsDialog from "./AddTermsDialog.vue";
 
 const clientLotId = inject("clientLotId");
 
-const { data, isLoading } = useAxios(
+const { data, isLoading, execute } = useAxios(
   `/client-lots/${clientLotId}`,
   useGuardedAxiosInstance(),
 );
