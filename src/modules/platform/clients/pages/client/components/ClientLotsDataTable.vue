@@ -26,7 +26,7 @@ import type { ColumnDef, VisibilityState } from "@tanstack/vue-table";
 import { useStorage } from "@vueuse/core";
 import { useAxios } from "@vueuse/integrations/useAxios.mjs";
 import { ArrowUpDown } from "lucide-vue-next";
-import { h, provide } from "vue";
+import { h } from "vue";
 import { useRoute } from "vue-router";
 import AddClientLotDialog from "./AddClientLotDialog.vue";
 import EditClientLotSheet from "./EditClientLotSheet.vue";
